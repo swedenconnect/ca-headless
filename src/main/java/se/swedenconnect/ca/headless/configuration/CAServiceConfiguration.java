@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.sigvaltrust.configuration;
+package se.swedenconnect.ca.headless.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.cms.CMSException;
@@ -24,8 +24,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
-import se.swedenconnect.ca.sigvaltrust.ca.P7BCertStore;
-import se.swedenconnect.ca.sigvaltrust.ca.HeadlessCAServices;
+import se.swedenconnect.ca.headless.ca.P7BCertStore;
+import se.swedenconnect.ca.headless.ca.HeadlessCAServices;
 import se.swedenconnect.ca.engine.ca.repository.CARepository;
 import se.swedenconnect.ca.service.base.configuration.BasicServiceConfig;
 import se.swedenconnect.ca.service.base.configuration.instance.CAServices;
@@ -42,7 +42,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Description
+ * CA Service configuration class that generates the CA services beans for each CA instance as defined by the configuration properties
+ * for each instance.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
@@ -54,6 +55,18 @@ public class CAServiceConfiguration implements ApplicationEventPublisherAware {
 
   private ApplicationEventPublisher applicationEventPublisher;
 
+  /**
+   * The CA services bean provide all CA services as defined by the configuration of each instance
+   * @param instanceConfiguration instance configuration properties
+   * @param pkcs11Provider the pkcs11 provider if such provider is configured (or null)
+   * @param basicServiceConfig basic service configuration data
+   * @param caRepositoryMap CA repositories for each instance
+   * @param p7BCertStore Provider of the CA repository PKCS7 certs only file for each instance
+   * @return {@link CAServices}
+   * @throws IOException error parsing data
+   * @throws CMSException error handling CMS data
+   * @throws CertificateException error parsing certificate data
+   */
   @Bean CAServices caServices(InstanceConfiguration instanceConfiguration, PKCS11Provider pkcs11Provider,
     BasicServiceConfig basicServiceConfig, Map<String, CARepository> caRepositoryMap, P7BCertStore p7BCertStore
     ) throws IOException, CMSException, CertificateException {
@@ -66,6 +79,13 @@ public class CAServiceConfiguration implements ApplicationEventPublisherAware {
     this.applicationEventPublisher = applicationEventPublisher;
   }
 
+  /**
+   * Provides CA repository implementations for each instance
+   * @param basicServiceConfig basic service configuration
+   * @param instanceConfiguration configuration properties for each instance
+   * @return map of {@link CARepository} for each instance
+   * @throws IOException error parsing data
+   */
   @Profile({"headless"})
   @DependsOn("BasicServiceConfig")
   @Bean Map<String, CARepository> caRepositoryMap (

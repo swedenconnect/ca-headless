@@ -14,36 +14,22 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.sigvaltrust.data;
+package se.swedenconnect.ca.headless;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.math.BigInteger;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Extracted data to support 
+ * Application main class
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class CertDisplayData {
+@SpringBootApplication(scanBasePackages = { "se.swedenconnect.ca.headless", "se.swedenconnect.ca.service.base"})
+public class HeadlessCaApplication {
 
-  private String cn;
-  private String o;
-  private String ou;
-  private String c;
-  private String orgId;
-  private String issueDate;
-  private String expiryDate;
-  private boolean revoked;
-  private boolean expired;
-  private String reason;
-  private String revocationDate;
-  private BigInteger serialNumber;
+  public static void main(String[] args) {
+    SpringApplication.run(HeadlessCaApplication.class, args);
+  }
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.sigvaltrust.controller;
+package se.swedenconnect.ca.headless.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -27,7 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import se.swedenconnect.ca.sigvaltrust.ca.P7BCertStore;
+import se.swedenconnect.ca.headless.ca.P7BCertStore;
 
 import java.io.InputStream;
 

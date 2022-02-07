@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.sigvaltrust.configuration;
+package se.swedenconnect.ca.headless.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +26,7 @@ import se.swedenconnect.ca.service.base.configuration.cmc.CMCApiProvider;
 import se.swedenconnect.ca.service.base.configuration.cmc.CMCReplayCheckerProvider;
 
 /**
- * Description
+ * Configuration class providing beans for CMC API support
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
@@ -36,11 +36,18 @@ import se.swedenconnect.ca.service.base.configuration.cmc.CMCReplayCheckerProvid
 @Profile("headless")
 public class CMCComponentConfiguration {
 
+  /**
+   * Provides a CMC replay checker provider providing replay checkers for CMC API instance creation
+   * @return {@link CMCReplayCheckerProvider}
+   */
   @Bean CMCReplayCheckerProvider cmcReplayChecker() {
     return (instance) -> new DefaultCMCReplayChecker();
   }
 
-
+  /**
+   * Provider generating instances of CMC API implementations
+   * @return {@link CMCApiProvider}
+   */
   @Bean CMCApiProvider cmcApiProvider() {
     return (instance, caService, requestParser, responseFactory) -> new DefaultCMCCaApi(caService, requestParser, responseFactory);
   }

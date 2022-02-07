@@ -1,4 +1,4 @@
-package se.swedenconnect.ca.sigvaltrust;
+package se.swedenconnect.ca.headless;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.sigvaltrust.configuration;
+package se.swedenconnect.ca.headless.configuration;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
- * This component enforce configured port restrictions on the admin UI to ensure that the UI is only available in accordance with set
+ * This component enforces configured port restrictions on the admin UI to ensure that the UI is only available in accordance with set
  * policy.
  *
  * This class typically enforces service port only, but may also implement other controls such as IP address whitelisting etc.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.sigvaltrust.controller;
+package se.swedenconnect.ca.headless.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +24,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import se.swedenconnect.ca.service.base.configuration.EmbeddedLogo;
 import se.swedenconnect.ca.service.base.configuration.service.HtmlServiceInfo;
-import se.swedenconnect.ca.sigvaltrust.configuration.ServicePortConstraints;
+import se.swedenconnect.ca.headless.configuration.ServicePortConstraints;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Map;
 
 /**
- * Web controller for the main service page
+ * Web controller for the main service page. This page is typically a simple static information page that can be accessed to se that the service
+ * is up and running. Access to this page is typically restricted to an internal service port.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)

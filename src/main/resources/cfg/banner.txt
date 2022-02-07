@@ -4,5 +4,5 @@
  |  _  | |  __/ | (_| | | (_| | | | |  __/ \__ \ \__ \   | |___   / ___ \
  |_| |_|  \___|  \__,_|  \__,_| |_|  \___| |___/ |___/    \____| /_/   \_\
 
-Version 1.0.0-SNAPSHOT
+Version 1.0.0
 Powered by Spring Boot ${spring-boot.version}

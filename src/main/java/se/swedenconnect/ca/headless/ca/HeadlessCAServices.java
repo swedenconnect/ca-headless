@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.sigvaltrust.ca;
+package se.swedenconnect.ca.headless.ca;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x509.KeyUsage;

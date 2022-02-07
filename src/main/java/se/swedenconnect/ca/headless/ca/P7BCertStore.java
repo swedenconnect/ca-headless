@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.sigvaltrust.ca;
+package se.swedenconnect.ca.headless.ca;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
