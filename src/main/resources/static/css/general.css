@@ -1,0 +1,31 @@
+.ca-service-table-head {
+    background-color: #284a6c;
+    color: #ffffff;
+}
+
+article .alert-box {
+    margin-bottom: 35px;
+    padding: 22px 30px 26px;
+    background-color: #f8d7da;
+}
+article .alert-box p:last-child {
+    margin-bottom: 0;
+}
+
+article .info-box {
+    margin-bottom: 35px;
+    padding: 22px 30px 26px;
+    background-color: #DDF3EA;
+}
+article .info-box p:last-child {
+    margin-bottom: 0;
+}
+
+.invalid-cert{
+    text-decoration: line-through;
+    color: #8e8c84;
+}
+.invalid-hl{
+    font-weight: bold;
+    color: #921e12;
+}
