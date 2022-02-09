@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021. Agency for Digital Government (DIGG)
+ * Copyright (c) 2021-2022.  Agency for Digital Government (DIGG)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class P7BCertStore {
 
   private final BasicServiceConfig basicServiceConfig;
   private final EquivalentCertProcessor equivalentCertProcessor;
-  private Map<String, P7bPublishResources> p7bResourcesMap;
+  private final Map<String, P7bPublishResources> p7bResourcesMap;
   @Value("${ca-service.p7b.max-age-seconds:30}") private int maxAgeSec;
 
   @Autowired
@@ -85,9 +85,9 @@ public class P7BCertStore {
     List<BigInteger> allCertSerials = caRepository.getAllCertificates();
     Date currentTime = new Date();
     List<X509CertificateHolder> subjectCertList = allCertSerials.stream()
-      .map(serialNumber -> caRepository.getCertificate(serialNumber))
+      .map(caRepository::getCertificate)
       .filter(certificateRecord -> !certificateRecord.isRevoked())
-      .map(certificateRecord -> getCert(certificateRecord))
+      .map(this::getCert).filter(Objects::nonNull)
       .filter(x509CertificateHolder -> currentTime.before(x509CertificateHolder.getNotAfter()))
       .filter(x509CertificateHolder -> currentTime.after(x509CertificateHolder.getNotBefore()))
       .collect(Collectors.toList());
@@ -112,7 +112,7 @@ public class P7BCertStore {
 
   public InputStream getCertStoreP7bBytes(String instance) throws IOException, CMSException, CertificateException {
     if (!p7bResourcesMap.containsKey(instance)){
-      log.debug("Requested instance () is not registered", instance);
+      log.debug("Requested instance {} is not registered", instance);
       throw new IOException("Requested instance is not registered");
     }
     P7bPublishResources p7bPublishResources = p7bResourcesMap.get(instance);
@@ -145,12 +145,9 @@ public class P7BCertStore {
       gen.addCertificate(cert);
     }
 
-    CMSSignedData signedData = gen.generate(new CMSProcessableByteArray((byte[])null), true);
+    CMSSignedData signedData = gen.generate(new CMSProcessableByteArray(null), true);
     return signedData.getEncoded();
   }
-
-
-
 
   @Data
   @NoArgsConstructor
