@@ -2,10 +2,17 @@
 
 **Latest current version 1.0.0**
 
-| Version | Comment                                   | Date       |
-|---------|-------------------------------------------|------------|
-| 1.0.0   | Initial version                           | 2022-02-07 |
+| Version | Comment                                                      | Date       |
+|---------|--------------------------------------------------------------|------------|
+| 1.0.0   | Initial version                                              | 2022-02-07 |
+| 1.1.0   | Support for DB Certificate repository as the default storage | 2022-02-07 |
+
 
 ## Important release notes (most recent on top)
 
 Release notes are provided only for updates that require configuration changes or other deployment considerations.
+
+### 1.1.0
+
+A new section 2.2.2.8 CA repository configuration is added, describing the configuration settings for setting up
+a CA repository using database storage.

@@ -1,6 +1,6 @@
 
 ---
-# CURRENT BUILD VERSION = 1.0.0
+# CURRENT BUILD VERSION = 1.1.0
 ---
 # Generic Headless CA service
 
@@ -25,8 +25,8 @@ To build the Headless CA, a total of 3 projects need to be built in the followin
 
  1. https://github.com/swedenconnect/ca-engine (version 1.1.1)
  2. https://github.com/swedenconnect/ca-cmc (version 1.1.1)
- 3. https://github.com/swedenconnect/ca-service-base (version 1.2.1)
- 4. https://github.com/swedenconnect/ca-headless (This repo) (version 1.0.0)
+ 3. https://github.com/swedenconnect/ca-service-base (version 1.3.0)
+ 4. https://github.com/swedenconnect/ca-headless (This repo) (version 1.1.0)
 
 The master branch of each repo holds the latest code under development. This is usually a SNAPSHOT version.
 For deployment, it is advisable to build a release version. Each release have a corresponding release branch. To build the source code, select the release branch of the latest release version before building the source code.
@@ -60,7 +60,7 @@ The following environment variables are essential to the CA application:
 | Environment variable                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 |-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `SPRING_CONFIG_ADDITIONAL_LOCATION` | Specifies the absolute path location of the configuration data folder. This folder must specify a location that is available to the CA application and the CA application must have write access to this folder and all its sub-folders. The absolute path specified by this variable must end with a delimiter ("/") so that `${SPRING_CONFIG_ADDITIONAL_LOCATION}child` specifies the absolute path of the child folder. (Note: this is a rule set by Spring Boot). |
-| `SPRING_PROFILES_ACTIVE`            | Specifies application profiles used by the CA service. This variable must be set to the value "`headless`"                                                                                                                                                                                                                                                                                                                                                            |
+| `SPRING_PROFILES_ACTIVE`            | Specifies an optional application profiles used by the CA service. This variable should be set to the value "`nodb`" if no database implementation of the CA repository is used (Se section on CA repository options).                                                                                                                                                                                                                                                |
 | `TZ`                                | Specifies the timezone used by the application. This should be set to "`Europe/Stockholm`"                                                                                                                                                                                                                                                                                                                                                                            |
 
 The `documentation/sample-config` folder contains sample configuration data. A corresponding folder must be available to the CA application at the location specified by `SPRING_CONFIG_ADDITIONAL_LOCATION`.
@@ -69,15 +69,15 @@ The `documentation/sample-config` folder contains sample configuration data. A c
 ### 2.2. Configuration files
 The configuration folder holds the following files and folders:
 
-| Resource                          | Description                                                                                           |
-|-----------------------------------|-------------------------------------------------------------------------------------------------------|
-| `cfg`                             | Holds optional configuration data files applicable to the CA application such as logotype image files |
-| `instances`                       | holds configuration and data files related to all configured CA instances.                            |
-| `application-headless.properties` | Main configuration file                                                                               |
+| Resource                 | Description                                                                                           |
+|--------------------------|-------------------------------------------------------------------------------------------------------|
+| `cfg`                    | Holds optional configuration data files applicable to the CA application such as logotype image files |
+| `instances`              | holds configuration and data files related to all configured CA instances.                            |
+| `application.properties` | Main configuration file                                                                               |
 
 #### 2.2.1. Instances folder
 
-The `instances` folder includes one folder for each instance of the CA service. Each folder has the name equal to the id of the instance defined in the main configuration file `application-headless.properties`. In the sample configuration there are 2 instances named `rot01` and `ca01`, where rot01 is a root CA service and the ca01 instance is a CA used to issue end entity certificates.
+The `instances` folder includes one folder for each instance of the CA service. Each folder has the name equal to the id of the instance defined in the main configuration file `application.properties`. In the sample configuration there are 2 instances named `rot01` and `ca01`, where rot01 is a root CA service and the ca01 instance is a CA used to issue end entity certificates.
 
 Each instance folder has 3 child folders as follows:
 
@@ -117,7 +117,7 @@ The repository folder is internally used by the CA instance to store data relate
 
 #### 2.2.2. Application properties configuration
 
-Configuration data for the service an all CA instances are specified in the `application-headless.properties` file. Properties settings are divided into sub categories as follows:
+Configuration data for the service an all CA instances are specified in the `application.properties` file. Properties settings are divided into sub categories as follows:
 
 ##### 2.2.2.1 Process logging levels
 
@@ -315,6 +315,103 @@ ca-service.instance.conf.ca01.ca.self-issued-valid-years=10
 ca-service.instance.conf.ca01.ocsp.name.common-name=OCSP Responder
 ```
 
+##### 2.2.2.8 CA repository configuration
+
+This CA service includes the alternatives to use file storage or database storage for the CA repository.
+
+Use of database storage is the default option which requires `application.properties` to include appropriate settings for the database connection
+for the repository. The option to use file based storage is mainly intended for test, but may be used in production environments where the operational
+security advantages of a complete database is not required or desired. In order to use the file based CA repository it is necessary to opt-out of
+database usage. This can be done by activating the Spring profile "`nodb`" (See section 2.1). Using this profile causes the application to use a file based
+repository and causes the application to ignore any database settings below.
+
+Database implementation use Spring Boot JPA (Jakarta Persistence API). This implementation allows a wide range of settings to optimize connection to
+any type of database. A useful guide is available here ([A guide to JPA with Spring](https://www.baeldung.com/the-persistence-layer-with-spring-and-jpa)).
+
+The dependencies of this project includes necessary dependencies for MySQL and PostgreSQL. To use any other DB service, relevant dependencies
+must be added to the project.
+
+###### 2.2.2.8.1 General settings
+
+Database is configured using Spring Boot property settings for JPA and spring datasource properties as described in this section. The following general settings are allways relevant.
+
+| Property                      | Description                                                                                                                                                                                                                                                                                                                                                                      |
+|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| spring.jpa.hibernate.ddl-auto | This property decides wether the appikcation should create a new data base on startup. The choices are: `create`, `update`, `create-drop`, `validate`, and `none`. create is used to create the database on first startup unless the database is created using a script or by other means. Once the database table is created, the service should allways use the `none` option. |
+| spring.datasource.url         | Specifies the url to the database. e.g: `jdbc:mysql://10.1.1.2:3306/headless_ca`                                                                                                                                                                                                                                                                                                 |
+| spring.datasource.username    | The username of the db account accessing the database                                                                                                                                                                                                                                                                                                                            |
+| spring.datasource.password    | The password of the db account user                                                                                                                                                                                                                                                                                                                                              |
+
+These are the only options that are needed in order to connect to a MySQL database.
+
+###### 2.2.2.8.2 PostgreSQL
+When connection to a PostgreSQL database, the following additional properties should be set:
+
+| Property                                                                | Description                                                                                                                                                                                                                                  |
+|-------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `spring.jpa.database=POSTGRESQL`                                        | Setting database to PostgreSQL in JPA                                                                                                                                                                                                        |
+| `spring.datasource.platform=postgres`                                   | Setting database to PostgreSQL in Spring datasource                                                                                                                                                                                          |
+| `spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true` | This entry is put just to avoid a warning message in the logs when you start the spring-boot application. This bug is from hibernate which tries to retrieve some metadata from postgresql db and failed to find that and logs as a warning. |
+
+###### 2.2.2.8.3 Optional
+
+The following property settings could be considered in addition to the settings above:
+
+| Property                     | Description                                                                                                                                                            |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| spring.jpa.generate-ddl=true | Work as a master switch for the `spring.jpa.hibernate.ddl-auto` setting described above. If theis setting is set to false, then all autogenerate actions are disabled. |
+| spring.jpa.show-sql=true     | Setting this property to true sends SQL query messages to standard out.                                                                                                |
+
+###### 2.2.2.8.4 Examples
+Here are some typical configuration examples:
+
+**MySQL**
+
+```
+spring.jpa.hibernate.ddl-auto=none
+spring.datasource.url=jdbc:mysql://10.1.1.2:3306/headless_ca
+spring.datasource.username=cadbuser
+spring.datasource.password=S3crEt
+
+```
+
+**PostgreSQL**
+
+```
+spring.jpa.database=POSTGRESQL
+spring.datasource.platform=postgres
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+spring.datasource.username=postgres
+spring.datasource.password=root
+spring.jpa.show-sql=true
+spring.jpa.generate-ddl=true
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+
+```
+
+###### 2.2.2.8.4 Database table creation
+
+The CA repository requires a table named `dbcertificate_record`. This table can be created programmatically using `spring.jpa.hibernate.ddl-auto=create`.
+For more control, it may be advisable to manually create the database using a SQL create statement. The precise syntax of such create statement may differ for different
+databases. The following create statement can be used to create the necessary table in MySQL:
+
+```
+CREATE TABLE `dbcertificate_record` (
+`id` varchar(255) NOT NULL,
+`certificate` blob NOT NULL,
+`expiry_date` bigint DEFAULT NULL,
+`instance` varchar(255) DEFAULT NULL,
+`issue_date` bigint DEFAULT NULL,
+`reason` int DEFAULT NULL,
+`revocation_time` bigint DEFAULT NULL,
+`revoked` bit(1) DEFAULT NULL,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+```
+
+
+
 
 ## 3. Operation
 ### 3.1. Running the docker container
@@ -327,7 +424,7 @@ The image name of this example is set to `headless-ca`. This name can however be
 docker run -d --name headless-ca --restart=always \
   -p 9070:8080 -p 9079:8009 -p 9073:8443 -p 9077:8000 -p 9076:8006 -p 9078:8008 \
   -e "SPRING_CONFIG_ADDITIONAL_LOCATION=/opt/ca/" \
-  -e "SPRING_PROFILES_ACTIVE=headless" \
+  -e "SPRING_PROFILES_ACTIVE=nodb" \
   -e "TZ=Europe/Stockholm" \
   -v /etc/localtime:/etc/localtime:ro \
   -v /opt/docker/headless-ca-hsm:/opt/ca \
@@ -340,7 +437,7 @@ A new CA instance is created using the following procedure:
 
 1. Create an instance data folder with the instance-id as the folder name, and then create a subfolder named "keys" inside the instance folder.
 2. Generate keys for the CA and its OCSP responder and store the applicable files in the "keys" folder.
-3. Update the application-headless.properties file with appropriate property settings for the new instance.
+3. Update the application.properties file with appropriate property settings for the new instance.
 4. Restart the CA service. This will cause the service to initialize the new instance CA repository and to generate new self issued CA certificate and OCSP certificate in the "repository" and the "certs" folders.
 
 If this CA instance is a root CA (is not signed by another CA higher in the trust path), then stop here.
@@ -361,7 +458,7 @@ This library also provides code for implementing a compatible CMC client used to
 
 ## 4 HSM configuration
 
-External PKCS#11 tokens, as well as softhsm PKCS#11 tokens can be configured through the following properties in application-headless.properties:
+External PKCS#11 tokens, as well as softhsm PKCS#11 tokens can be configured through the following properties in application.properties:
 
 | Parameter                                     | Value                                                                                                                                                                                             |
 |-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -384,8 +481,8 @@ Soft HSM properties in addition to generic PKCS#11 properties above. Note that f
 
 Audit logs can be sent to Syslog by:
 
-1. Setting `application-headless.properties` property `ca-service.syslog.enabled` to the value **true**
-2. Configuring available syslog hosts in the configuration file `application-headless.properties`.
+1. Setting `application.properties` property `ca-service.syslog.enabled` to the value **true**
+2. Configuring available syslog hosts in the configuration file `application.properties`.
 
 **Note:** If syslog is **not** enabled according to step 1 above, then the audit log will be available through the management port according to section 6, under the relative path "auditevents". (E.g http://localhost:8008/manage/auditevents).
 

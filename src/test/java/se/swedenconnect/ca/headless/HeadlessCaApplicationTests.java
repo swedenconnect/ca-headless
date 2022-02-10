@@ -23,7 +23,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(locations = "classpath:application-test.properties")
 @SpringBootTest
-@ActiveProfiles("mock")
+@ActiveProfiles("nodb")
 class HeadlessCaApplicationTests {
 
   @Test

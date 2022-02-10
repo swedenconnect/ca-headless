@@ -33,7 +33,6 @@ import se.swedenconnect.ca.service.base.configuration.cmc.CMCReplayCheckerProvid
  */
 @Slf4j
 @Configuration
-@Profile("headless")
 public class CMCComponentConfiguration {
 
   /**
