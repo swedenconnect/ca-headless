@@ -27,6 +27,8 @@ import org.springframework.context.annotation.Profile;
 import se.swedenconnect.ca.headless.ca.P7BCertStore;
 import se.swedenconnect.ca.headless.ca.HeadlessCAServices;
 import se.swedenconnect.ca.engine.ca.repository.CARepository;
+import se.swedenconnect.ca.headless.ca.db.DBCARepository;
+import se.swedenconnect.ca.headless.ca.db.DBJPARepository;
 import se.swedenconnect.ca.service.base.configuration.BasicServiceConfig;
 import se.swedenconnect.ca.service.base.configuration.instance.CAServices;
 import se.swedenconnect.ca.service.base.configuration.instance.InstanceConfiguration;
@@ -49,7 +51,6 @@ import java.util.Set;
  * @author Stefan Santesson (stefan@idsec.se)
  */
 @Slf4j
-@Profile("headless")
 @Configuration
 public class CAServiceConfiguration implements ApplicationEventPublisherAware {
 
@@ -86,9 +87,9 @@ public class CAServiceConfiguration implements ApplicationEventPublisherAware {
    * @return map of {@link CARepository} for each instance
    * @throws IOException error parsing data
    */
-  @Profile({"headless"})
+  @Profile({"nodb"})
   @DependsOn("BasicServiceConfig")
-  @Bean Map<String, CARepository> caRepositoryMap (
+  @Bean Map<String, CARepository> fileCaRepositoryMap (
     BasicServiceConfig basicServiceConfig,
     InstanceConfiguration instanceConfiguration
   ) throws IOException {
@@ -101,6 +102,33 @@ public class CAServiceConfiguration implements ApplicationEventPublisherAware {
       File crlFile = new File(repositoryDir, instance + ".crl");
       File repoFile = new File(repositoryDir, instance + "-repo.json");
       CARepository caRepository= new LocalJsonCARepository(crlFile, repoFile);
+      caRepositoryMap.put(instance, caRepository);
+    }
+    return caRepositoryMap;
+  }
+
+  /**
+   * Provides a DB CA repository implementations for each instance
+   * @param basicServiceConfig basic service configuration
+   * @param instanceConfiguration configuration properties for each instance
+   * @return map of {@link CARepository} for each instance
+   * @throws IOException error parsing data
+   */
+  @Profile({"!nodb"})
+  @DependsOn("BasicServiceConfig")
+  @Bean Map<String, CARepository> dbCaRepositoryMap (
+    BasicServiceConfig basicServiceConfig,
+    InstanceConfiguration instanceConfiguration,
+    DBJPARepository dbRepository
+  ) throws IOException {
+    Map<String, CAConfigData> instanceConfigMap = instanceConfiguration.getInstanceConfigMap();
+    Set<String> instances = instanceConfigMap.keySet();
+    Map<String, CARepository> caRepositoryMap = new HashMap<>();
+    for (String instance: instances) {
+      File repositoryDir = new File(basicServiceConfig.getDataStoreLocation(), "instances/"+instance+"/repository");
+      log.info("Using a DB repository for instance {}", instance);
+      File crlFile = new File(repositoryDir, instance + ".crl");
+      CARepository caRepository= new DBCARepository(crlFile, dbRepository, instance);
       caRepositoryMap.put(instance, caRepository);
     }
     return caRepositoryMap;
