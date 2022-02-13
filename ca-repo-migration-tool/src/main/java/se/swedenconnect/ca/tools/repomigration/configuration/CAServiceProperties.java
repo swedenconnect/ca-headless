@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022.  Agency for Digital Government (DIGG)
+ * Copyright (c) 2021. Agency for Digital Government (DIGG)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.headless;
+package se.swedenconnect.ca.tools.repomigration.configuration;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import lombok.Data;
+import lombok.ToString;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import se.swedenconnect.ca.service.base.configuration.properties.CAConfigData;
+
+import java.util.Map;
 
 /**
- * Application main class
+ * Description
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)
  */
-@EnableScheduling
-@SpringBootApplication(scanBasePackages = { "se.swedenconnect.ca.headless", "se.swedenconnect.ca.service.base"})
-public class HeadlessCaApplication {
+@Configuration
+@ConfigurationProperties(prefix = "ca-service.instance")
+@Data
+@ToString
+public class CAServiceProperties {
 
-  public static void main(String[] args) {
-    SpringApplication.run(HeadlessCaApplication.class, args);
-  }
+  /** Configuration data map for instances of a CA */
+  Map<String, CAConfigData> conf;
 
 }

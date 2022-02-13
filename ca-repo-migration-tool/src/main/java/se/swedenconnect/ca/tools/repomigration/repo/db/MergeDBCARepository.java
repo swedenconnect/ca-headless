@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.headless.ca.db;
+package se.swedenconnect.ca.tools.repomigration.repo.db;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.bouncycastle.asn1.x509.CRLNumber;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,16 +29,15 @@ import se.swedenconnect.ca.engine.ca.repository.CertificateRecord;
 import se.swedenconnect.ca.engine.ca.repository.SortBy;
 import se.swedenconnect.ca.engine.revocation.CertificateRevocationException;
 import se.swedenconnect.ca.engine.revocation.crl.CRLRevocationDataProvider;
-import se.swedenconnect.ca.engine.revocation.crl.RevokedCertificate;
+import se.swedenconnect.ca.service.base.configuration.keys.BasicX509Utils;
+import se.swedenconnect.ca.tools.repomigration.repo.MergeCARepository;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -54,43 +47,15 @@ import java.util.stream.Collectors;
  * @author Stefan Santesson (stefan@idsec.se)
  */
 @Slf4j
-public class DBCARepository implements CARepository, CRLRevocationDataProvider {
+public class MergeDBCARepository implements CARepository, MergeCARepository {
 
-  private final File crlFile;
   private final String instance;
   @Getter private final DBJPARepository dbRepository;
-  private BigInteger crlNumber;
-  private boolean criticalError = false;
-  @Setter private int pageSize = 100;
+  @Setter private int pageSize = 1000;
 
-  public DBCARepository(File crlFile, DBJPARepository dbRepository, String instance) throws IOException {
-    this.crlFile = crlFile;
+  public MergeDBCARepository(DBJPARepository dbRepository, String instance) throws IOException {
     this.dbRepository = dbRepository;
     this.instance = instance;
-
-    // Load current certs to memory
-    log.info("Database based CA repository initialized");
-    if (!crlFile.exists()) {
-      this.crlNumber = BigInteger.ZERO;
-      crlFile.getParentFile().mkdirs();
-      if (!crlFile.getParentFile().exists()) {
-        log.error("Unable to create crl file directory");
-        criticalError = true;
-        throw new IOException("Unable to create crl file directory");
-      }
-      log.info("Starting new CRL sequence with CRL number 0");
-    }
-    else {
-      crlNumber = getCRLNumberFromCRL();
-      log.info("CRL number counter initialized with CRL number {}", crlNumber.toString(16));
-    }
-  }
-
-  private BigInteger getCRLNumberFromCRL() throws IOException {
-    X509CRLHolder crlHolder = new X509CRLHolder(new FileInputStream(crlFile));
-    Extension crlNumberExtension = crlHolder.getExtension(Extension.cRLNumber);
-    CRLNumber crlNumberFromCrl = CRLNumber.getInstance(crlNumberExtension.getParsedValue());
-    return crlNumberFromCrl.getCRLNumber();
   }
 
   @Override public List<BigInteger> getAllCertificates() {
@@ -109,14 +74,52 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
   }
 
   @Override public CertificateRecord getCertificate(BigInteger bigInteger) {
-    List<DBCertificateRecord> records = dbRepository.findByInstanceAndSerialNumber(instance, bigInteger.toString(16));
+    List<DBCertificateRecord> records = new ArrayList<>();
+    long startTime = System.currentTimeMillis();
+    // This is a protection against exception caused by too many DP connections if this function is iterated in a loop over many certs
+    while (System.currentTimeMillis() < startTime + 3000) {
+      try {
+        records = dbRepository.findByInstanceAndSerialNumber(instance, bigInteger.toString(16));
+        break;
+      }
+      catch (Exception ex) {
+        // request for a record caused exception (we expect that the number of connections was exceeded). Let's wait and try again in 50 ms
+        try {
+          Thread.sleep(50);
+        }
+        catch (InterruptedException e) {
+          // Unrecoverable error.
+          throw new RuntimeException("Error obtaining certificate from database", e);
+        }
+      }
+    }
     return !records.isEmpty() ? records.get(0) : null;
   }
 
-  @Override public synchronized void addCertificate(X509CertificateHolder certificate) throws IOException {
-    if (criticalError) {
-      throw new IOException("This repository encountered a critical error and is not operational - unable to store certificates");
+  @Override public void addCertificateRecord(CertificateRecord certificateRecord) throws IOException {
+    try {
+      final X509Certificate certificate = BasicX509Utils.getCertificate(certificateRecord.getCertificate());
+      CertificateRecord record = getCertificate(certificate.getSerialNumber());
+      if (record != null) {
+        throw new IOException("This certificate already exists in the certificate repository");
+      }
+      dbRepository.save(new DBCertificateRecord(
+        certificateRecord.getCertificate(),
+        certificateRecord.getSerialNumber(),
+        certificateRecord.getIssueDate(),
+        certificateRecord.getExpiryDate(),
+        certificateRecord.isRevoked(),
+        certificateRecord.getReason(),
+        certificateRecord.getRevocationTime(),
+        instance
+      ));
+    } catch (Exception ex) {
+      throw (ex instanceof IOException) ? (IOException) ex : new IOException(ex);
     }
+
+  }
+
+  @Override public synchronized void addCertificate(X509CertificateHolder certificate) throws IOException {
     if (certificate != null) {
       CertificateRecord record = getCertificate(certificate.getSerialNumber());
       if (record != null) {
@@ -128,22 +131,11 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
   }
 
   @Override public void revokeCertificate(BigInteger serialNumber, int reason, Date revocationTime) throws CertificateRevocationException {
-    if (serialNumber == null) {
-      throw new CertificateRevocationException("Null Serial number");
-    }
-    DBCertificateRecord certificateRecord = (DBCertificateRecord) getCertificate(serialNumber);
-    if (certificateRecord == null) {
-      throw new CertificateRevocationException("No such certificate (" + serialNumber.toString(16) + ")");
-    }
-    certificateRecord.setRevoked(true);
-    certificateRecord.setReason(reason);
-    certificateRecord.setRevocationTime(revocationTime);
-
-    dbRepository.save(certificateRecord);
+    throw new CertificateRevocationException("Unsupported action");
   }
 
   @Override public CRLRevocationDataProvider getCRLRevocationDataProvider() {
-    return this;
+    return null;
   }
 
   /**
@@ -247,45 +239,4 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
     return expiredCertificates;
   }
 
-  @Override public List<RevokedCertificate> getRevokedCertificates() {
-
-    List<RevokedCertificate> revokedCertificates = new ArrayList<>();
-    int page = 0;
-
-    while (true) {
-      Page<DBCertificateRecord> records = dbRepository.findByInstanceAndRevoked(instance, true, PageRequest.of(page++, pageSize));
-      if (records.hasContent()) {
-        records.stream().forEach(certificateRecord -> {
-          revokedCertificates.add(new RevokedCertificate(
-            certificateRecord.getSerialNumber(),
-            certificateRecord.getRevocationTime(),
-            certificateRecord.getReason()
-          ));
-        });
-      }
-      else {
-        break;
-      }
-    }
-    return revokedCertificates;
-  }
-
-  @Override public BigInteger getNextCrlNumber() {
-    crlNumber = crlNumber.add(BigInteger.ONE);
-    return crlNumber;
-  }
-
-  @SneakyThrows @Override public void publishNewCrl(X509CRLHolder crl) {
-    FileUtils.writeByteArrayToFile(crlFile, crl.getEncoded());
-  }
-
-  @Override public X509CRLHolder getCurrentCrl() {
-    try {
-      return new X509CRLHolder(new FileInputStream(crlFile));
-    }
-    catch (Exception e) {
-      log.debug("No current CRL is available. Returning null");
-      return null;
-    }
-  }
 }
