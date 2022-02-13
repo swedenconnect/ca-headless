@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021. Agency for Digital Government (DIGG)
+ * Copyright (c) 2021-2022.  Agency for Digital Government (DIGG)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Test implementation of a CA repository
+ * Implementation of the JSON based CA repository, extended to support migration.
+ * This differs from the original implementation by 1) adding the capability to store complete records instead of just new certificates
+ * and 2) removing all revocation functions.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @author Stefan Santesson (stefan@idsec.se)

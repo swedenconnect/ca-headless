@@ -1,1 +1,1 @@
-CA Repository migration tool 1.0.0-SNAPSHOT
+CA Repository migration tool version 1.0.0

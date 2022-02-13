@@ -65,31 +65,9 @@ public class CARepositoryConfiguration {
           .fileRepository(caRepository)
           .dbRepository(dbRepository)
         .build());
-
-/*      // Attempt to initialize DB connections
-      long startTime = System.currentTimeMillis();
-      int errorCount = 0;
-      while (System.currentTimeMillis() < startTime + 10000){
-        try {
-          System.out.println("Instance: " + instance + "  ("
-            + caRepository.getCertificateCount(false) + " JSON file records - "
-            + dbRepository.getCertificateCount(false) + " DB records)"
-          );
-          break;
-        } catch (Exception ex) {
-          try {
-            errorCount++;
-            Thread.sleep(50);
-          }
-          catch (InterruptedException e) {
-            System.out.println("Error connecting to repositories" + e);
-            break;
-          }
-        }
+      if (log.isInfoEnabled()){
+        log.info("Initializing repository for instance {} ({} JSON file records - {}  DB records", instance, caRepository.getCertificateCount(false), dbRepository.getCertificateCount(false));
       }
-      if (errorCount > 0){
-        System.out.println("Connect error count = " + errorCount);
-      } */
     }
     return caRepositoryMap;
   }

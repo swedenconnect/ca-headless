@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2022.  Agency for Digital Government (DIGG)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package se.swedenconnect.ca.tools.repomigration;
 
 import org.apache.commons.cli.*;
@@ -10,6 +26,14 @@ import se.swedenconnect.ca.tools.repomigration.options.AppOptions;
 
 import java.io.File;
 
+/**
+ * Main application for this CLI Spring Boot application that is executed using java -jar repomigrate.jar [options]
+ *
+ * Help menu is available through java -jar repomigrate.jar -help
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
+ */
 @SpringBootApplication()
 public class CaRepositoryApplication implements CommandLineRunner {
 
@@ -39,6 +63,7 @@ public class CaRepositoryApplication implements CommandLineRunner {
        */
       System.setProperty("logging.level.root", "INFO");
       System.setProperty("logging.level.se.swedenconnect.ca.tools.repomigration.CaRepositoryApplication", "INFO");
+      System.setProperty("logging.level.se.swedenconnect.ca.tools.repomigration", "INFO");
     }
 
     File configDir;
