@@ -38,7 +38,7 @@ public class AppOptions {
         op = new Options();
         op.addOption(OPTION_DIR, true, "Configuration directory for the CA service");
         op.addOption(OPTION_LIST, false, "List available certificates in present repositories");
-        op.addOption(OPTION_VERBOSE, false, "Verbose list information");
+        op.addOption(OPTION_VERBOSE, false, "Verbose output");
         op.addOption(OPTION_DB_MERGE, false, "Include this argument to merge certificates in the file repository into the database repository");
         op.addOption(OPTION_FILE_MERGE, false, "Include this argument to merge certificates in the database repository into the file repository");
         op.addOption(OPTION_LOG, false, "Enable display of process logging");
