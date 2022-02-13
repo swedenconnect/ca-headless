@@ -18,10 +18,10 @@ Each CA instance has its own administration web page, its own CA repository and 
 
 This project holds 2 complementary tools:
 
-| Tool                                                             | Descritpion                                                                                                             |
-|------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| [CA Repository migration tool](ca-repo-migration-tool/README.md) | Tool to merge data from one type of repository (e.g. file based) to another type (e.g. Database based)                  |
-| [HSM key generation support](hsm-support/HSM_KEYGEN.md)          | Scripts for key generation inside a HSM module to support the CA. A script for software key generation is also provided |
+| Tool                                                   | Descritpion                                                                                                             |
+|--------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| [CA Repository migration tool](ca-repo-migration-tool) | Tool to merge data from one type of repository (e.g. file based) to another type (e.g. Database based)                  |
+| [HSM key generation support](hsm-support)              | Scripts for key generation inside a HSM module to support the CA. A script for software key generation is also provided |
 
 ## 1. Building artifacts
 ### 1.1. Building the source code
