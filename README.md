@@ -16,7 +16,7 @@ The CA service application may hold any number of Certification Authority (CA) s
 
 Each CA instance has its own administration web page, its own CA repository and its own revocation services. This CA service has a simple manual administration interface for issuing and revoking certificates. No API is provided for receiving and validating requests from other services by automated means. The administration UI of this service requires login using username and password. While OCSP and CRL:s allways must be made available on the public internet, the admin UI can be configured to be exposed on the main service port och can be directed to a secondary service port only made available on the local network.
 
-This project holds 2 complementary tools:
+**This project holds two complementary tools:**
 
 | Tool                                                   | Descritpion                                                                                                             |
 |--------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
