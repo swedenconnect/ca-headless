@@ -1,11 +1,12 @@
 # Headless CA versions
 
-**Latest current version 1.0.0**
+**Latest current version 1.1.1**
 
-| Version | Comment                                                      | Date       |
-|---------|--------------------------------------------------------------|------------|
-| 1.0.0   | Initial version                                              | 2022-02-07 |
-| 1.1.0   | Support for DB Certificate repository as the default storage | 2022-02-07 |
+| Version | Comment                                                                   | Date       |
+|---------|---------------------------------------------------------------------------|------------|
+| 1.0.0   | Initial version                                                           | 2022-02-07 |
+| 1.1.0   | Support for DB Certificate repository as the default storage              | 2022-02-07 |
+| 1.1.1   | Fixing daemon bug caused by missing annotation. Added supplementary tools | 2022-02-14 |
 
 
 ## Important release notes (most recent on top)
