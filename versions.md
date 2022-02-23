@@ -2,12 +2,13 @@
 
 **Latest current version 1.1.2**
 
-| Version | Comment                                                                   | Date       |
-|---------|---------------------------------------------------------------------------|------------|
-| 1.0.0   | Initial version                                                           | 2022-02-07 |
-| 1.1.0   | Support for DB Certificate repository as the default storage              | 2022-02-07 |
-| 1.1.1   | Fixing daemon bug caused by missing annotation. Added supplementary tools | 2022-02-14 |
-| 1.1.2   | Allowing empty context path for CA                                        | 2022-02-23 |
+| Version | Comment                                                                              | Date       |
+|---------|--------------------------------------------------------------------------------------|------------|
+| 1.0.0   | Initial version                                                                      | 2022-02-07 |
+| 1.1.0   | Support for DB Certificate repository as the default storage                         | 2022-02-07 |
+| 1.1.1   | Fixing daemon bug caused by missing annotation. Added supplementary tools            | 2022-02-14 |
+| 1.1.2   | Allowing empty context path for CA                                                   | 2022-02-23 |
+| 1.1.3   | Publishing a new CRL directly upon CMC revocation instead of waiting for next update | 2022-02-23 |
 
 
 ## Important release notes (most recent on top)
