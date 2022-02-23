@@ -15,7 +15,7 @@ This script requires that the following components are installed:
 This script and the tools above must be installed on a host that is connected to the HSM device and has a HSM client installed available through a PKCS#11 library file (such as `/usr/lib/softhsm/libsofthsm2.so` for SoftHSM 2).
 
 
-## Running the the script in the CA container
+## Running the script in the CA container
 
 This script can be used inside the CA container in order to initialize keys in a HSM that are to be used in a CA instance. To do this, the CA must first be started up before the instance using the keys is configured in `application-csca.properties`
 
