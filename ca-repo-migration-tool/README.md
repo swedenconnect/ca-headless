@@ -27,11 +27,11 @@ The executable file `repobigrate.jar` is located in the target folder.
 
 This tool is a command line tool run using the following basic command:
 
-> java -jar repobigrate.jar [options]
+> java -jar repomigrate.jar [options]
 
 A help menu is available by the following command:
 
-> java -jar repobigrate.jar -help
+> java -jar repomigrate.jar -help
 
 This produce the following output:
 
