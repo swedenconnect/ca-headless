@@ -34,7 +34,7 @@ usage() {
     echo "   -k, --key-type         Key type either in the form EC:{curve-name} or RSA:{key size}(default is EC:secp256r1)"
     echo "       --hash             Must be 'sha256', 'sha384' or 'sha512' (default is sha256)"
     echo "   -v  --valid-days       Certificate validity time (default is 365)"
-    echo "   -o  --output-file      Name of the output file"
+    echo "   -o  --output-file      Name of the output file without file name extension"
     echo "   -h, --help             Prints this help"
     echo
 }
