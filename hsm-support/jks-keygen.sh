@@ -34,6 +34,7 @@ usage() {
     echo "   -k, --key-type         Key type either in the form EC:{curve-name} or RSA:{key size}(default is EC:secp256r1)"
     echo "       --hash             Must be 'sha256', 'sha384' or 'sha512' (default is sha256)"
     echo "   -v  --valid-days       Certificate validity time (default is 365)"
+    echo "   -o  --output-file      Name of the output file"
     echo "   -h, --help             Prints this help"
     echo
 }
@@ -55,6 +56,7 @@ KEY_TYPE=""
 HASH=""
 VALID_DAYS=""
 TARGET_FOLDER=""
+OUTPUT_FILE=""
 
 while :
 do
@@ -81,6 +83,10 @@ do
 	    ;;
 	-t | --target-folder)
 	    TARGET_FOLDER="$2"
+	    shift 2
+	    ;;
+	-o | --output-file)
+	    OUTPUT_FILE="$2"
 	    shift 2
 	    ;;
 	--hash)
@@ -143,10 +149,13 @@ if [ "$TARGET_FOLDER" != "" ]; then
     fi
     TARGET_FOLDER=${TARGET_FOLDER}/
 fi
+if [ "$OUTPUT_FILE" == "" ]; then
+    OUTPUT_FILE=$ALIAS
+fi
 
 # Only support default profile for now
 PROFILE=$DEFAULT_PROFILE
-TARGET_FILE=${TARGET_FOLDER}${ALIAS}
+TARGET_FILE=${TARGET_FOLDER}${OUTPUT_FILE}
 echo "Profile set to DEFAULT certificate profile" >&1
 
 if [ -d "_temp" ]; then
