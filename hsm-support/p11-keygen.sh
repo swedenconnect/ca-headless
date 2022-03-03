@@ -285,7 +285,7 @@ EOF
 #
 
 echo "Generating key of type $KEY_TYPE with id=$KID and alias=$ALIAS"
-pkcs11-tool --module $MODULE --slot $SLOT --login -p ${PASSWD} --keypairgen --id $((KID)) --label $ALIAS --key-type $KEY_TYPE --usage-sign
+pkcs11-tool --module $MODULE --slot $SLOT --login -p ${PASSWD} --keypairgen --id $((KID)) --label $ALIAS --key-type $KEY_TYPE
 
 #
 # Generating certificate
