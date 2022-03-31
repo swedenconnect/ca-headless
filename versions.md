@@ -1,6 +1,6 @@
 # Headless CA versions
 
-**Latest current version 1.1.2**
+**Latest current version 1.1.4**
 
 | Version | Comment                                                                              | Date       |
 |---------|--------------------------------------------------------------------------------------|------------|
