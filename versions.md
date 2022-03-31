@@ -1,6 +1,6 @@
 # Headless CA versions
 
-**Latest current version 1.1.4**
+**Latest current version 1.1.5**
 
 | Version | Comment                                                                              | Date       |
 |---------|--------------------------------------------------------------------------------------|------------|
@@ -10,6 +10,7 @@
 | 1.1.2   | Allowing empty context path for CA                                                   | 2022-02-23 |
 | 1.1.3   | Publishing a new CRL directly upon CMC revocation instead of waiting for next update | 2022-02-23 |
 | 1.1.4   | Including mitigation of spring core RCE vulnerability                                | 2022-03-31 |
+| 1.1.5   | Moving to Spring boot 2.6.6 as a stable mitigation of RCE                            | 2022-03-31 |
 
 
 ## Important release notes (most recent on top)
