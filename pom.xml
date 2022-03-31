@@ -27,7 +27,7 @@
 
     <groupId>se.swedenconnect.ca</groupId>
     <artifactId>headless-ca</artifactId>
-    <version>1.1.4-SNAPSHOT</version>
+    <version>1.1.4</version>
 
     <name>Headless CA</name>
     <description>Basic headless CA Service with CMC as the only admin API</description>
@@ -35,7 +35,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <ca.service.base.version>1.3.2</ca.service.base.version>
+        <ca.service.base.version>1.3.3</ca.service.base.version>
         <sivaltrust.commons.version>1.0.2</sivaltrust.commons.version>
         <java.version>11</java.version>
     </properties>

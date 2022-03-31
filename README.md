@@ -1,6 +1,6 @@
 
 ---
-# CURRENT BUILD VERSION = 1.1.3
+# CURRENT BUILD VERSION = 1.1.4
 ---
 # Generic Headless CA service
 
@@ -33,8 +33,8 @@ To build the Headless CA, a total of 3 projects need to be built in the followin
  1. https://github.com/swedenconnect/ca-engine (version 1.1.1)
  2. https://github.com/swedenconnect/ca-cmc (version 1.1.2)
  3. https://github.com/swedenconnect/sigvaltrust-service/tree/main/commons (version 1.0.2)
- 4. https://github.com/swedenconnect/ca-service-base (version 1.3.2)
- 5. https://github.com/swedenconnect/ca-headless (This repo) (version 1.1.3)
+ 4. https://github.com/swedenconnect/ca-service-base (version 1.3.3)
+ 5. https://github.com/swedenconnect/ca-headless (This repo) (version 1.1.4)
 
 The master branch of each repo holds the latest code under development. This is usually a SNAPSHOT version.
 For deployment, it is advisable to build a release version. Each release have a corresponding release branch. To build the source code, select the release branch of the latest release version before building the source code.
