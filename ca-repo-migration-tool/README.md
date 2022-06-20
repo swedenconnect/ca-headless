@@ -119,7 +119,7 @@ Merging file repository certs to DB:
 Merged 11 certificates to DB repository
 ```
 
-If on the other had, the current records resides in a Database, and the target is to merge these records to file storage, the corresponding command is:
+If on the other hand, the current records resides in a Database, and the target is to merge these records to file storage, the corresponding command is:
 
 > java -jar repomigrate.jar -d /opt/ca -filemerge
 
