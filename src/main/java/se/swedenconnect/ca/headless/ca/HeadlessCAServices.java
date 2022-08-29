@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
 import org.springframework.context.ApplicationEventPublisher;
+import se.swedenconnect.ca.engine.ca.issuer.CertificateIssuanceException;
 import se.swedenconnect.ca.engine.ca.issuer.CertificateIssuer;
 import se.swedenconnect.ca.engine.ca.issuer.CertificateIssuerModel;
 import se.swedenconnect.ca.engine.ca.issuer.impl.SelfIssuedCertificateIssuer;
@@ -31,6 +32,7 @@ import se.swedenconnect.ca.engine.ca.models.cert.extension.impl.simple.KeyUsageM
 import se.swedenconnect.ca.engine.ca.models.cert.impl.DefaultCertificateModelBuilder;
 import se.swedenconnect.ca.engine.ca.models.cert.impl.SelfIssuedCertificateModelBuilder;
 import se.swedenconnect.ca.engine.ca.repository.CARepository;
+import se.swedenconnect.ca.engine.revocation.CertificateRevocationException;
 import se.swedenconnect.ca.engine.revocation.crl.CRLIssuerModel;
 import se.swedenconnect.ca.service.base.configuration.BasicServiceConfig;
 import se.swedenconnect.ca.service.base.configuration.instance.InstanceConfiguration;
@@ -76,7 +78,7 @@ public class HeadlessCAServices extends AbstractDefaultCAServices {
   /** {@inheritDoc} */
   @Override protected AbstractBasicCA getBasicCaService(String instance, String type, PrivateKey privateKey, List<X509CertificateHolder> caChain,
     CARepository caRepository, CertificateIssuerModel certIssuerModel, CRLIssuerModel crlIssuerModel, List<String> crlDistributionPoints)
-    throws NoSuchAlgorithmException {
+    throws NoSuchAlgorithmException, CertificateRevocationException {
 
     log.info("Creating a signature validation trust CA for instance {}", instance);
     return new HeadlessCAService(privateKey, caChain, caRepository, certIssuerModel, crlIssuerModel, crlDistributionPoints);
@@ -89,7 +91,7 @@ public class HeadlessCAServices extends AbstractDefaultCAServices {
 
   /** {@inheritDoc} */
   @Override protected X509CertificateHolder generateSelfIssuedCaCert(LocalKeySource caKeySource, CAConfigData caConfigData, String instance, String baseUrl)
-    throws NoSuchAlgorithmException {
+    throws NoSuchAlgorithmException, CertificateIssuanceException {
     // We implement our own Self issued profile in order to add the SubjectInfoAccess URL to self issued certificates
     CAConfigData.CaConfig caConfig = caConfigData.getCa();
     if (caConfig.getSelfIssuedValidYears() == null) {

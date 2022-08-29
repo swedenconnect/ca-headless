@@ -5,7 +5,7 @@
 # Generic Headless CA service
 
 
-This repo contains the source code for the core headless CA service. The service is "headless", which means that it has no web GUI for management and cert issuance and consequently provides no login support for admin login. 
+This repo contains the source code for the core headless CA service. The service is "headless", which means that it has no web GUI for management and cert issuance and consequently provides no login support for admin login.
 The only option tha manage this CA service is by means of a CMC API and direct access to the CA repository. This CA service is intended to be used as a generic CA service that is managed through authorizes CMC clients (RA).
 
 The source code builds a Spring Boot application that may be deployed as is, or may be built into a Docker image using any of the provided Dockerfile examples.
@@ -14,7 +14,7 @@ This document provides build, deployment and operational instructions. Example f
 
 The CA service application may hold any number of Certification Authority (CA) services, referred to as "**Instances**".
 
-Each CA instance has its own administration web page, its own CA repository and its own revocation services. This CA service has a simple manual administration interface for issuing and revoking certificates. No API is provided for receiving and validating requests from other services by automated means. The administration UI of this service requires login using username and password. While OCSP and CRL:s allways must be made available on the public internet, the admin UI can be configured to be exposed on the main service port och can be directed to a secondary service port only made available on the local network.
+Each CA instance has its own CA repository and its own revocation services.
 
 **This project holds two complementary tools:**
 
@@ -460,7 +460,7 @@ If this CA is a CA that should be signed by a root CA, then proceed as described
 
 ### 3.3 Issue and revoke certificates
 
-Issuing and revoking certificates in the CA service provided by this application is exclusively done through the CMC API. Please refer to the documentation of the ca-cmc library for documentation of the CMC API. 
+Issuing and revoking certificates in the CA service provided by this application is exclusively done through the CMC API. Please refer to the documentation of the ca-cmc library for documentation of the CMC API.
 This library also provides code for implementing a compatible CMC client used to request and revoke certificates.
 
 

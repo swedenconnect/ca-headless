@@ -25,6 +25,7 @@ import se.swedenconnect.ca.engine.ca.issuer.CertificateIssuerModel;
 import se.swedenconnect.ca.engine.ca.models.cert.CertNameModel;
 import se.swedenconnect.ca.engine.ca.models.cert.impl.DefaultCertificateModelBuilder;
 import se.swedenconnect.ca.engine.ca.repository.CARepository;
+import se.swedenconnect.ca.engine.revocation.CertificateRevocationException;
 import se.swedenconnect.ca.engine.revocation.crl.CRLIssuerModel;
 import se.swedenconnect.ca.service.base.configuration.instance.ca.AbstractBasicCA;
 
@@ -46,7 +47,8 @@ public class HeadlessCAService extends AbstractBasicCA {
 
   public HeadlessCAService(PrivateKey privateKey, List<X509CertificateHolder> caCertificateChain,
     CARepository caRepository, CertificateIssuerModel certIssuerModel,
-    CRLIssuerModel crlIssuerModel, List<String> crlDistributionPoints) throws NoSuchAlgorithmException {
+    CRLIssuerModel crlIssuerModel, List<String> crlDistributionPoints)
+    throws NoSuchAlgorithmException, CertificateRevocationException {
     super(privateKey, caCertificateChain, caRepository, certIssuerModel, crlIssuerModel, crlDistributionPoints);
     this.caCertificateChain = caCertificateChain;
     log.info("Instantiated Headless CA service instance");
