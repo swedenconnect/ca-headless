@@ -4,7 +4,7 @@ usage() {
     echo "Usage: $0 [options...]" >&2
     echo
     echo "   -p, --pin              Pin for the HSM slot"
-    echo "   -l, --label            Label for the HSM slot (default = 'softhsm')"
+    echo "   -l, --label            Label for the HSM slot (default = 'softhsmslot')"
     echo "   -h, --help             Prints this help"
     echo
 }
@@ -54,7 +54,7 @@ if [ "$LABEL" == "" ]; then
 fi
 
 
-echo "Initalizing key klot in soft hsm"
+echo "Initializing key klot in soft hsm"
 MODULE="/usr/lib/softhsm/libsofthsm2.so"
 
 pkcs11-tool --module $MODULE --init-token --slot 0 --so-pin 1217813 --init-pin --pin $PIN --label $LABEL

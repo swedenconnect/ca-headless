@@ -1,11 +1,14 @@
 ARG FROM_IMAGE
 FROM $FROM_IMAGE
 
+# Get HSM pin as input argument
 ARG PIN
+# Get HSM slot label as input argument
 ARG SLOT_LABEL
+# Get key directory relative path where extracted keys are stored as input argument
 ARG KEY_DIR
+# Get script dir where the key import script is stored as input argument
 ARG SCRIPT_DIR
-
 
 # Make softhsm2 available for install
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
