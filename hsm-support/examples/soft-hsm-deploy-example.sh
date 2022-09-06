@@ -41,6 +41,7 @@ alias=(
 	"ca" \
 	"ocsp")
 
+# Other build parameters
 hsm_pin="s3cr3t"
 hsm_slot_label="cakeys"
 docker_from_image="headless-ca:m1"
