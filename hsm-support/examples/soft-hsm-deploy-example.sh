@@ -15,8 +15,8 @@ cd "$(dirname "$0")"
 # Key identifiers used as alias for the hsm key access
 key_id=(
   "ca01-ca" \
-	"ca01-ocsp" \
-	"root01-ca" \
+  "ca01-ocsp" \
+  "root01-ca" \
 	"tls-ca" \
 	"tls-ocsp")
 # Key store locations used as key sources
