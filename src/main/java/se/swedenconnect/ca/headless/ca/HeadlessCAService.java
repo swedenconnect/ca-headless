@@ -16,7 +16,6 @@
 
 package se.swedenconnect.ca.headless.ca;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -25,14 +24,12 @@ import se.swedenconnect.ca.engine.ca.issuer.CertificateIssuerModel;
 import se.swedenconnect.ca.engine.ca.models.cert.CertNameModel;
 import se.swedenconnect.ca.engine.ca.models.cert.impl.DefaultCertificateModelBuilder;
 import se.swedenconnect.ca.engine.ca.repository.CARepository;
-import se.swedenconnect.ca.engine.revocation.CertificateRevocationException;
 import se.swedenconnect.ca.engine.revocation.crl.CRLIssuerModel;
 import se.swedenconnect.ca.service.base.configuration.instance.ca.AbstractBasicCA;
 import se.swedenconnect.security.credential.PkiCredential;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.util.List;
@@ -46,19 +43,16 @@ import java.util.List;
 @Slf4j
 public class HeadlessCAService extends AbstractBasicCA {
 
-  @Getter private List<X509CertificateHolder> caCertificateChain;
-
   public HeadlessCAService(PkiCredential issuerCredential,
     CARepository caRepository, CertificateIssuerModel certIssuerModel,
     CRLIssuerModel crlIssuerModel, List<String> crlDistributionPoints)
     throws NoSuchAlgorithmException, IOException, CertificateEncodingException {
     super(issuerCredential, caRepository, certIssuerModel, crlIssuerModel, crlDistributionPoints);
-    this.caCertificateChain = caCertificateChain;
     log.info("Instantiated Headless CA service instance");
   }
 
   @Override protected DefaultCertificateModelBuilder getBaseCertificateModelBuilder(CertNameModel subject, PublicKey publicKey,
-    X509CertificateHolder issuerCertificate, CertificateIssuerModel certificateIssuerModel) throws CertificateIssuanceException {
+    X509CertificateHolder issuerCertificate, CertificateIssuerModel certificateIssuerModel) {
     DefaultCertificateModelBuilder certModelBuilder = DefaultCertificateModelBuilder.getInstance(publicKey, getCaCertificate(),
       certificateIssuerModel);
     certModelBuilder
