@@ -34,8 +34,8 @@ import se.swedenconnect.ca.engine.ca.repository.CARepository;
 import se.swedenconnect.ca.engine.ca.repository.CertificateRecord;
 import se.swedenconnect.ca.engine.utils.CAUtils;
 import se.swedenconnect.ca.service.base.configuration.BasicServiceConfig;
-import se.swedenconnect.sigvaltrust.service.commons.EquivalentCertProcessor;
-import se.swedenconnect.sigvaltrust.service.commons.impl.DefaultEquivalentCertProcessor;
+import se.swedenconnect.ca.service.base.support.CertificateDuplicateChecker;
+import se.swedenconnect.ca.service.base.support.DefaultCertificateDuplicateChecker;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,14 +60,14 @@ import java.util.stream.Collectors;
 public class P7BCertStore {
 
   private final BasicServiceConfig basicServiceConfig;
-  private final EquivalentCertProcessor equivalentCertProcessor;
+  private final CertificateDuplicateChecker certificateDuplicateChecker;
   private final Map<String, P7bPublishResources> p7bResourcesMap;
   @Value("${ca-service.p7b.max-age-seconds:30}") private int maxAgeSec;
 
   @Autowired
   public P7BCertStore(BasicServiceConfig basicServiceConfig) {
     this.basicServiceConfig = basicServiceConfig;
-    this.equivalentCertProcessor = new DefaultEquivalentCertProcessor();
+    this.certificateDuplicateChecker = new DefaultCertificateDuplicateChecker();
     this.p7bResourcesMap = new HashMap<>();
   }
 
@@ -93,7 +93,7 @@ public class P7BCertStore {
       .collect(Collectors.toList());
 
     // Remove any certificate duplicates
-    final List<X509CertificateHolder> uniqueCertList = getCertHolderList(equivalentCertProcessor.removeEquivalentCerts(CAUtils.getCertList(subjectCertList)));
+    final List<X509CertificateHolder> uniqueCertList = getCertHolderList(certificateDuplicateChecker.removeEquivalentCerts(CAUtils.getCertList(subjectCertList)));
 
     // Create PKCS7 file
     byte[] pkcs7 = getPKCS7(uniqueCertList);

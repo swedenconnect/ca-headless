@@ -35,8 +35,8 @@ import se.swedenconnect.ca.engine.ca.repository.CARepository;
 import se.swedenconnect.ca.engine.revocation.crl.CRLIssuerModel;
 import se.swedenconnect.ca.service.base.configuration.BasicServiceConfig;
 import se.swedenconnect.ca.service.base.configuration.instance.InstanceConfiguration;
-import se.swedenconnect.ca.service.base.configuration.instance.ca.AbstractBasicCA;
-import se.swedenconnect.ca.service.base.configuration.instance.impl.AbstractDefaultCAServices;
+import se.swedenconnect.ca.service.base.ca.impl.AbstractBasicCA;
+import se.swedenconnect.ca.service.base.ca.impl.AbstractDefaultCAServices;
 import se.swedenconnect.ca.service.base.configuration.keys.PkiCredentialFactory;
 import se.swedenconnect.ca.service.base.configuration.properties.CAConfigData;
 import se.swedenconnect.ca.service.base.utils.GeneralCAUtils;
@@ -80,7 +80,7 @@ public class HeadlessCAServices extends AbstractDefaultCAServices {
     CARepository caRepository, CertificateIssuerModel certIssuerModel, CRLIssuerModel crlIssuerModel, List<String> crlDistributionPoints)
     throws NoSuchAlgorithmException, IOException, CertificateEncodingException {
 
-    log.info("Creating a signature validation trust CA for instance {}", instance);
+    log.info("Creating a CA service for instance {}", instance);
     return new HeadlessCAService(issuerCredential, caRepository, certIssuerModel, crlIssuerModel, crlDistributionPoints);
   }
 

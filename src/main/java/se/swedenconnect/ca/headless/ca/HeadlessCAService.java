@@ -19,13 +19,12 @@ package se.swedenconnect.ca.headless.ca;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.cert.X509CertificateHolder;
-import se.swedenconnect.ca.engine.ca.issuer.CertificateIssuanceException;
 import se.swedenconnect.ca.engine.ca.issuer.CertificateIssuerModel;
 import se.swedenconnect.ca.engine.ca.models.cert.CertNameModel;
 import se.swedenconnect.ca.engine.ca.models.cert.impl.DefaultCertificateModelBuilder;
 import se.swedenconnect.ca.engine.ca.repository.CARepository;
 import se.swedenconnect.ca.engine.revocation.crl.CRLIssuerModel;
-import se.swedenconnect.ca.service.base.configuration.instance.ca.AbstractBasicCA;
+import se.swedenconnect.ca.service.base.ca.impl.AbstractBasicCA;
 import se.swedenconnect.security.credential.PkiCredential;
 
 import java.io.IOException;

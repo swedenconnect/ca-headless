@@ -60,11 +60,6 @@
             <version>${ca.service.base.version}</version>
         </dependency>
         <dependency>
-            <groupId>se.swedenconnect.sigvaltrust.service</groupId>
-            <artifactId>commons</artifactId>
-            <version>${sivaltrust.commons.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
@@ -74,11 +69,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
-            <artifactId>owasp-java-html-sanitizer</artifactId>
-            <version>[1.1,)</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
