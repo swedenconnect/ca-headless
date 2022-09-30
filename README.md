@@ -1,8 +1,10 @@
+![Logo](documentation/images/sweden-connect.png)
+
+# Generic Headless CA service
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ---
-# CURRENT BUILD VERSION = 1.2.0
----
-# Generic Headless CA service
 
 
 This repo contains the source code for the core headless CA service. The service is "headless", which means that it has no web GUI for management and cert issuance and consequently provides no login support for admin login.

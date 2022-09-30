@@ -16,13 +16,13 @@
 
 package se.swedenconnect.ca.headless.ca.db;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.asn1.x509.CRLNumber;
+import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -44,7 +44,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -99,7 +98,8 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
     while (true) {
       Page<DBCertificateRecord> records = dbRepository.findByInstance(instance, PageRequest.of(page++, pageSize));
       if (records.hasContent()) {
-        records.stream().forEach(dbCertificateRecord -> certificateSerialNumberList.add(dbCertificateRecord.getSerialNumber()));
+        records.stream()
+          .forEach(dbCertificateRecord -> certificateSerialNumberList.add(dbCertificateRecord.getSerialNumber()));
       }
       else {
         break;
@@ -115,7 +115,8 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
 
   @Override public synchronized void addCertificate(X509CertificateHolder certificate) throws IOException {
     if (criticalError) {
-      throw new IOException("This repository encountered a critical error and is not operational - unable to store certificates");
+      throw new IOException(
+        "This repository encountered a critical error and is not operational - unable to store certificates");
     }
     if (certificate != null) {
       CertificateRecord record = getCertificate(certificate.getSerialNumber());
@@ -127,7 +128,9 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
     }
   }
 
-  @Override public void revokeCertificate(BigInteger serialNumber, int reason, Date revocationTime) throws CertificateRevocationException {
+  @Override public void revokeCertificate(BigInteger serialNumber, int reason, Date revocationTime)
+    throws CertificateRevocationException {
+
     if (serialNumber == null) {
       throw new CertificateRevocationException("Null Serial number");
     }
@@ -135,10 +138,53 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
     if (certificateRecord == null) {
       throw new CertificateRevocationException("No such certificate (" + serialNumber.toString(16) + ")");
     }
+    if (certificateRecord.isRevoked() && CRLReason.aACompromise < certificateRecord.getReason()) {
+      throw new CertificateRevocationException("Illegal reason code");
+    }
+
+    if (certificateRecord.isRevoked()) {
+      if (certificateRecord.getReason() == CRLReason.certificateHold) {
+        if (CRLReason.removeFromCRL == reason) {
+          // remove this certificate from certificateHold status
+          log.debug("Removing certificate from certificateHold");
+          certificateRecord.setRevoked(false);
+          certificateRecord.setReason(null);
+          certificateRecord.setRevocationTime(null);
+          // Save revoked certificate
+          dbRepository.save(certificateRecord);
+          return;
+        }
+        // This was not a request to remove the revocation, but to permanently revoke.
+        log.debug("Modifying revoked certificate from certificateHold to reason {}", reason);
+        certificateRecord.setRevoked(true);
+        certificateRecord.setReason(reason);
+        certificateRecord.setRevocationTime(revocationTime);
+        // Save revoked certificate
+        dbRepository.save(certificateRecord);
+        return;
+      }
+      else {
+        if (CRLReason.removeFromCRL == reason) {
+          log.debug("Revocation removal request denied since certificate has already been permanently revoked");
+          throw new CertificateRevocationException(
+            "Revocation removal request denied since certificate has already been permanently revoked");
+        }
+        log.debug("Certificate is already revoked with reason other than certificate hold");
+        throw new CertificateRevocationException(
+          "Revocation request denied since certificate is already revoked with reason other than certificate hold");
+      }
+    }
+
+    // This certificate was not revoked before. Revoke it
+    if (CRLReason.removeFromCRL == reason) {
+      log.debug("Revocation removal request denied since certificate is not on hold");
+      throw new CertificateRevocationException("Removal request for a certificate that has not been revoked");
+    }
+
     certificateRecord.setRevoked(true);
     certificateRecord.setReason(reason);
     certificateRecord.setRevocationTime(revocationTime);
-
+    // Save revoked certificate
     dbRepository.save(certificateRecord);
   }
 
@@ -161,14 +207,15 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
   /**
    * Get a range of certificates from the certificate repository
    *
-   * @param page       the index of the page of certificates to return
-   * @param pageSize   the size of each page of certificates
+   * @param page the index of the page of certificates to return
+   * @param pageSize the size of each page of certificates
    * @param notRevoked true if the pages of certificates holds only not revoked certificates
-   * @param sortBy     set to define sorting preferences or null if unsorted
+   * @param sortBy set to define sorting preferences or null if unsorted
    * @param descending set to true to select descending order
    * @return list of certificates in the selected page
    */
-  @Override public List<CertificateRecord> getCertificateRange(int page, int pageSize, boolean notRevoked, SortBy sortBy,
+  @Override public List<CertificateRecord> getCertificateRange(int page, int pageSize, boolean notRevoked,
+    SortBy sortBy,
     boolean descending) {
 
     Pageable pageable = PageRequest.of(page, pageSize);
@@ -253,7 +300,8 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
     int page = 0;
 
     while (true) {
-      Page<DBCertificateRecord> records = dbRepository.findByInstanceAndRevoked(instance, true, PageRequest.of(page++, pageSize));
+      Page<DBCertificateRecord> records = dbRepository.findByInstanceAndRevoked(instance, true,
+        PageRequest.of(page++, pageSize));
       if (records.hasContent()) {
         records.stream().forEach(certificateRecord -> {
           revokedCertificates.add(new RevokedCertificate(
