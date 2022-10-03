@@ -31,9 +31,9 @@ import se.swedenconnect.ca.engine.ca.repository.CARepository;
 import se.swedenconnect.ca.headless.ca.db.DBCARepository;
 import se.swedenconnect.ca.headless.ca.db.DBJPARepository;
 import se.swedenconnect.ca.service.base.configuration.BasicServiceConfig;
-import se.swedenconnect.ca.service.base.configuration.instance.CAServices;
+import se.swedenconnect.ca.service.base.ca.CAServices;
 import se.swedenconnect.ca.service.base.configuration.instance.InstanceConfiguration;
-import se.swedenconnect.ca.service.base.configuration.instance.LocalJsonCARepository;
+import se.swedenconnect.ca.service.base.ca.LocalJsonCARepository;
 import se.swedenconnect.ca.service.base.configuration.keys.PkiCredentialFactory;
 import se.swedenconnect.ca.service.base.configuration.properties.CAConfigData;
 
