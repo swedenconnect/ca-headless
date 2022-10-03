@@ -1,6 +1,6 @@
 # Headless CA versions
 
-**Latest current version 1.1.5**
+**Latest current version 1.2.0**
 
 | Version | Comment                                                                              | Date       |
 |---------|--------------------------------------------------------------------------------------|------------|
@@ -21,3 +21,9 @@ Release notes are provided only for updates that require configuration changes o
 
 A new section 2.2.2.8 CA repository configuration is added, describing the configuration settings for setting up
 a CA repository using database storage.
+
+### 1.2.0
+
+This version does not require configuration of logotypes and icons. Any use of these graphical images has been removed.
+
+Caused by the update of HSM library, the only option remaining to configure a HSM slot is via a single PKCS#11 configuration file.
