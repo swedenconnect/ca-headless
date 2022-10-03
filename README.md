@@ -10,7 +10,9 @@
 This repo contains the source code for the core headless CA service. The service is "headless", which means that it has no web GUI for management and cert issuance and consequently provides no login support for admin login.
 The only option tha manage this CA service is by means of a CMC API and direct access to the CA repository. This CA service is intended to be used as a generic CA service that is managed through authorizes CMC clients (RA).
 
-The source code builds a Spring Boot application that may be deployed as is, or may be built into a Docker image using any of the provided Dockerfile examples.
+Such CA CMC client suitable for use with this CA service is available here: [https://github.com/swedenconnect/ca-cmc-admin](https://github.com/swedenconnect/ca-cmc-admin)
+
+The source code for this CA service builds a Spring Boot application that may be deployed as is, or may be built into a Docker image using any of the provided Dockerfile examples.
 
 This document provides build, deployment and operational instructions. Example files used to illustrate service deployment are provided in the `documentation/sample-config` folder.
 
@@ -18,28 +20,21 @@ The CA service application may hold any number of Certification Authority (CA) s
 
 Each CA instance has its own CA repository and its own revocation services.
 
-**This project holds two complementary tools:**
+**This project holds two complementary tool:**
 
 | Tool                                                   | Descritpion                                                                                                             |
 |--------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
 | [CA Repository migration tool](ca-repo-migration-tool) | Tool to merge data from one type of repository (e.g. file based) to another type (e.g. Database based)                  |
-| [HSM key generation support](hsm-support)              | Scripts for key generation inside a HSM module to support the CA. A script for software key generation is also provided |
 
 ## 1. Building artifacts
 ### 1.1. Building the source code
 
 Building source codes referred to here requires maven version 3.3 or higher.
 
-To build the Headless CA, a total of 3 projects need to be built in the following order:
-
- 3. https://github.com/swedenconnect/sigvaltrust-service/tree/main/commons (version 1.0.2)
- 4. https://github.com/swedenconnect/ca-service-base (version 1.3.4)
- 5. https://github.com/swedenconnect/ca-headless (This repo) (version 1.1.4)
-
 The master branch of each repo holds the latest code under development. This is usually a SNAPSHOT version.
 For deployment, it is advisable to build a release version. Each release have a corresponding release branch. To build the source code, select the release branch of the latest release version before building the source code.
 
-Each one of the projects are built by executing the following command from the project folder containing the pom.xml file:
+The application is built by executing the following command from the project folder containing the pom.xml file:
 
 > mvn clean install
 
@@ -51,7 +46,6 @@ Three sample Dockerfile files are provided:
 |--------------------|----------------------------------------------------------------------------------------------------------------------------------------|
 | Dockerfile         | Builds a docker image that exposes all relevant default ports                                                                          |
 | Dockerfile-debug   | Builds a docker image that allows attachment of a remote debugger on port 8000                                                         |
-| Dockerfile-softhsm | Builds a docker image that includes a SoftHSM and tools to load keys into the SoftHSM. This image is used to test the HSM PKCS#11 API. |
 
 A docker image can be built using the following command:
 
@@ -59,6 +53,10 @@ A docker image can be built using the following command:
 
 Please refer to the Docker manual for instructions on how to build and/or modify these docker images.
 
+**Testing with SoftHSM**
+
+HSM support for this CA service is based on the Credential Support library: [https://github.com/swedenconnect/credentials-support](https://github.com/swedenconnect/credentials-support)
+Scripts for building an extended docker image with support for SoftHSM with imported and deployed keys are available here: [https://github.com/swedenconnect/credentials-support/tree/main/hsm-support-scripts/soft-hsm-deployment](https://github.com/swedenconnect/credentials-support/tree/main/hsm-support-scripts/soft-hsm-deployment)
 
 ## 2. Configuration
 
@@ -77,11 +75,12 @@ The `documentation/sample-config` folder contains sample configuration data. A c
 ### 2.2. Configuration files
 The configuration folder holds the following files and folders:
 
-| Resource                 | Description                                                                                           |
-|--------------------------|-------------------------------------------------------------------------------------------------------|
-| `cfg`                    | Holds optional configuration data files applicable to the CA application such as logotype image files |
-| `instances`              | holds configuration and data files related to all configured CA instances.                            |
-| `application.properties` | Main configuration file                                                                               |
+| Resource                 | Description                                                                                                                    |
+|--------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| `cfg`                    | Holds optional configuration data files applicable to the CA application such as logotype image files                          |
+| `cmc`                    | Holds optional configuration data files supporting the CMC API of the service as specified by `application.properties` values. |
+| `instances`              | holds configuration and data files related to all configured CA instances.                                                     |
+| `application.properties` | Main configuration file                                                                                                        |
 
 #### 2.2.1. Instances folder
 
@@ -466,24 +465,12 @@ This library also provides code for implementing a compatible CMC client used to
 
 ## 4 HSM configuration
 
-External PKCS#11 tokens, as well as softhsm PKCS#11 tokens can be configured through the following properties in application.properties:
+External PKCS#11 tokens, as well as softhsm PKCS#11 tokens can be configured through an external PKCS#11 configuration file using the following properties in application.properties value:
 
-| Parameter                                     | Value                                                                                                                                                                                             |
-|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `ca-service.pkcs11.lib`                       | location of pkcs#11 library                                                                                                                                                                       |
-| `ca-service.pkcs11.name`                      | A chosen name of the PKCS#11 provider. The actual name of the provider will be "SunPKCS11-{this name}-{index}".                                                                                   |
-| `ca-service.pkcs11.slotListIndex`             | The start slot index to use (default 0).                                                                                                                                                          |
-| `ca-service.pkcs11.slotListIndexMaxRange`     | The maximum number of slots after start index that will be used if present. Default null. A null value means that only 1 slot will be used.                                                       |
-| `ca-service.pkcs11.slot`                      | The actual name of the slot to use. If this parameter is set, then slotListIndex should not be set.                                                                                               |
-| `ca-service.pkcs11.external-config-locations` | Specifies an array of file paths to PKCS#11 configuration files used to setup PKCS11 providers. **If this option is set, all other options above are ignored**.                                   |
-| `ca-service.pkcs11.reloadable-keys`           | Specifies if private keys shall be tested and reloaded if connection to the key is lost, prior to each usage. Using this option (**true**) have performance penalties but may increase stability. |
+| Parameter                                     | Value                                                                                                      |
+|-----------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| `ca-service.pkcs11.external-config-locations` | Specifies an absolute file name (and path) to a PKCS#11 configuration file used to setup PKCS11 providers. |
 
-Soft HSM properties in addition to generic PKCS#11 properties above. Note that for soft hsm, the parameters slot, slotListIndex and slotListIndexMaxRange are ignored.
-
-| Parameter                               | Value                                                                                                                          |
-|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| `ca-service.pkcs11.softhsm.keylocation` | The location of keys using the name convention alias.key and alias.crt.                                                        |
-| `ca-service.pkcs11.softhsm.pass`        | The pin/password for the soft hsm slot to use. This pin/password should be configured as the password for each configured key. |
 
 ## 5 Audit logging to syslog
 
