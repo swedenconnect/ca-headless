@@ -29,6 +29,8 @@ import se.swedenconnect.ca.headless.ca.P7BCertStore;
 import se.swedenconnect.ca.headless.ca.HeadlessCAServices;
 import se.swedenconnect.ca.engine.ca.repository.CARepository;
 import se.swedenconnect.ca.headless.ca.db.DBCARepository;
+import se.swedenconnect.ca.headless.ca.db.DBCRLJPARepository;
+import se.swedenconnect.ca.headless.ca.db.DBCRLMetadataRepository;
 import se.swedenconnect.ca.headless.ca.db.DBJPARepository;
 import se.swedenconnect.ca.service.base.configuration.BasicServiceConfig;
 import se.swedenconnect.ca.service.base.ca.CAServices;
@@ -69,6 +71,7 @@ public class CAServiceConfiguration implements ApplicationEventPublisherAware {
    * @throws CMSException error handling CMS data
    * @throws CertificateException error parsing certificate data
    */
+  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Bean CAServices caServices(InstanceConfiguration instanceConfiguration, PkiCredentialFactory pkiCredentialFactory,
     BasicServiceConfig basicServiceConfig, Map<String, CARepository> caRepositoryMap, P7BCertStore p7BCertStore
     ) throws IOException, CMSException, CertificateException {
@@ -112,6 +115,8 @@ public class CAServiceConfiguration implements ApplicationEventPublisherAware {
    * Provides a DB CA repository implementations for each instance
    * @param basicServiceConfig basic service configuration
    * @param instanceConfiguration configuration properties for each instance
+   * @param dbRepository CA repository database table
+   * @param dbcrljpaRepository CRL metadata repository database table
    * @return map of {@link CARepository} for each instance
    * @throws IOException error parsing data
    */
@@ -120,7 +125,8 @@ public class CAServiceConfiguration implements ApplicationEventPublisherAware {
   @Bean Map<String, CARepository> dbCaRepositoryMap (
     BasicServiceConfig basicServiceConfig,
     InstanceConfiguration instanceConfiguration,
-    DBJPARepository dbRepository
+    DBJPARepository dbRepository,
+    DBCRLJPARepository dbcrljpaRepository
   ) throws IOException {
     Map<String, CAConfigData> instanceConfigMap = instanceConfiguration.getInstanceConfigMap();
     Set<String> instances = instanceConfigMap.keySet();
@@ -129,7 +135,7 @@ public class CAServiceConfiguration implements ApplicationEventPublisherAware {
       File repositoryDir = new File(basicServiceConfig.getDataStoreLocation(), "instances/"+instance+"/repository");
       log.info("Using a DB repository for instance {}", instance);
       File crlFile = new File(repositoryDir, instance + ".crl");
-      CARepository caRepository= new DBCARepository(crlFile, dbRepository, instance);
+      CARepository caRepository= new DBCARepository(crlFile, dbRepository, instance, new DBCRLMetadataRepository(dbcrljpaRepository));
       caRepositoryMap.put(instance, caRepository);
     }
     return caRepositoryMap;

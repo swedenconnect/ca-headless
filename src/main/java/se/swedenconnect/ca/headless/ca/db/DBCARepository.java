@@ -16,35 +16,38 @@
 
 package se.swedenconnect.ca.headless.ca.db;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.asn1.x509.CRLNumber;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import se.swedenconnect.ca.engine.ca.repository.CARepository;
 import se.swedenconnect.ca.engine.ca.repository.CertificateRecord;
 import se.swedenconnect.ca.engine.ca.repository.SortBy;
 import se.swedenconnect.ca.engine.revocation.CertificateRevocationException;
+import se.swedenconnect.ca.engine.revocation.crl.CRLMetadata;
 import se.swedenconnect.ca.engine.revocation.crl.CRLRevocationDataProvider;
 import se.swedenconnect.ca.engine.revocation.crl.RevokedCertificate;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Test implementation of a CA repository
@@ -58,35 +61,29 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
   private final File crlFile;
   private final String instance;
   @Getter private final DBJPARepository dbRepository;
-  private BigInteger crlNumber;
+  private final DBCRLMetadataRepository dbcrlMetadataRepository;
   private boolean criticalError = false;
   @Setter private int pageSize = 100;
 
-  public DBCARepository(File crlFile, DBJPARepository dbRepository, String instance) throws IOException {
+  public DBCARepository(File crlFile, DBJPARepository dbRepository, String instance,
+    DBCRLMetadataRepository dbcrlMetadataRepository) throws IOException {
     this.crlFile = crlFile;
     this.dbRepository = dbRepository;
     this.instance = instance;
-
+    this.dbcrlMetadataRepository = dbcrlMetadataRepository;
     // Load current certs to memory
     log.info("Database based CA repository initialized");
     if (!crlFile.exists()) {
-      this.crlNumber = BigInteger.ZERO;
       crlFile.getParentFile().mkdirs();
       if (!crlFile.getParentFile().exists()) {
         log.error("Unable to create crl file directory");
         criticalError = true;
         throw new IOException("Unable to create crl file directory");
       }
-      log.info("Starting new CRL sequence with CRL number 0");
-    }
-    else {
-      crlNumber = getCRLNumberFromCRL();
-      log.info("CRL number counter initialized with CRL number {}", crlNumber.toString(16));
     }
   }
 
-  private BigInteger getCRLNumberFromCRL() throws IOException {
-    X509CRLHolder crlHolder = new X509CRLHolder(new FileInputStream(crlFile));
+  private BigInteger getCRLNumberFromCRL(X509CRLHolder crlHolder) throws IOException {
     Extension crlNumberExtension = crlHolder.getExtension(Extension.cRLNumber);
     CRLNumber crlNumberFromCrl = CRLNumber.getInstance(crlNumberExtension.getParsedValue());
     return crlNumberFromCrl.getCRLNumber();
@@ -319,15 +316,39 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
   }
 
   @Override public BigInteger getNextCrlNumber() {
-    crlNumber = crlNumber.add(BigInteger.ONE);
-    return crlNumber;
+    return getCurrentCRLMetadata().getCrlNumber().add(BigInteger.ONE);
   }
 
-  @SneakyThrows @Override public void publishNewCrl(X509CRLHolder crl) {
-    FileUtils.writeByteArrayToFile(crlFile, crl.getEncoded());
+  @Override public void publishNewCrl(X509CRLHolder crl) {
+    // Check if new CRL has updated the CRL metadata
+    CRLMetadata currentCRLMetadata = getCurrentCRLMetadata();
+
+    try {
+      BigInteger crlNumberFromCRL = getCRLNumberFromCRL(crl);
+      if (crlNumberFromCRL.compareTo(currentCRLMetadata.getCrlNumber()) > 0) {
+        // The new CRL has increased the CRL number. Store its metadata for all to use
+        CRLMetadata crlMetadata = CRLMetadata.builder()
+          .crlNumber(crlNumberFromCRL)
+          .issueTime(crl.getThisUpdate().toInstant())
+          .nextUpdate(crl.getNextUpdate().toInstant())
+          .revokedCertCount(crl.getRevokedCertificates().size())
+          .build();
+        dbcrlMetadataRepository.storeCrlMetadata(crlMetadata, instance);
+      }
+
+      FileUtils.writeByteArrayToFile(crlFile, crl.getEncoded());
+    }
+    catch (IOException e) {
+      throw new RuntimeException("Critical error attempting to store CRL file", e);
+    }
   }
 
   @Override public X509CRLHolder getCurrentCrl() {
+    /*
+      Here we want to compare the current CRL against CRL metadata
+      If metadata indicates that this CRL is not up-to-date, we
+      will return null, in order to force a new update
+     */
     try {
       return new X509CRLHolder(new FileInputStream(crlFile));
     }
@@ -336,4 +357,49 @@ public class DBCARepository implements CARepository, CRLRevocationDataProvider {
       return null;
     }
   }
+
+  @Override public CRLMetadata getCurrentCRLMetadata() {
+
+    CRLMetadata crlMetadata = dbcrlMetadataRepository.getCRLMetadata(instance);
+    if (crlMetadata != null) {
+      return crlMetadata;
+    }
+    log.warn("CRL Metadata not present in Repository: Attempting to store data from current CRL");
+
+    try {
+      X509CRLHolder currentCrl = getCurrentCrl();
+      crlMetadata = CRLMetadata.builder()
+        .crlNumber(getCRLNumberFromCRL(currentCrl))
+        .issueTime(currentCrl.getThisUpdate().toInstant())
+        .nextUpdate(currentCrl.getNextUpdate().toInstant())
+        .revokedCertCount(currentCrl.getRevokedCertificates().size())
+        .build();
+      dbcrlMetadataRepository.storeCrlMetadata(crlMetadata, instance);
+      log.info("Stored CRL metadata to DB from current available CRL file");
+      return crlMetadata;
+    }
+    catch (Exception ex) {
+      log.warn("No current CRL is available in the system");
+    }
+    // No metadata in DB and no CRL file. Starting fresh with new CRL
+    log.info("Starting new CRL sequence with CRL number 0");
+    crlMetadata = CRLMetadata.builder()
+      .crlNumber(BigInteger.ZERO)
+      .issueTime(Instant.ofEpochMilli(0L))
+      .nextUpdate(Instant.ofEpochMilli(0L))
+      .revokedCertCount(0)
+      .build();
+    dbcrlMetadataRepository.storeCrlMetadata(crlMetadata, instance);
+    return crlMetadata;
+  }
+
+/*
+  @Override public void afterPropertiesSet() throws Exception {
+    CRLMetadata crlMetadata = getCurrentCRLMetadata();
+    log.info(
+      "For instance {} - Starting CRL with CRL number {}, issued at {}, expiring {}, with {} revoked certificates",
+      instance, crlMetadata.getCrlNumber(), crlMetadata.getIssueTime(), crlMetadata.getNextUpdate(),
+      crlMetadata.getRevokedCertCount());
+  }
+*/
 }
