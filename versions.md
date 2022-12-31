@@ -34,6 +34,21 @@ CRL that match the metadata (CRL number, issue time, next update time) of the la
 
 This property has a default value of 60 seconds, which is used if this property is not set.
 
+A new database table is introduced to store CRL metadata for all configured CA instances. This table use the following structure
+(expressed as MySQL create statement):
+
+```
+CREATE TABLE `crl_metadata` (
+`instance` varchar(255) NOT NULL,
+`crl_number` varchar(255) DEFAULT NULL,
+`issue_time` bigint DEFAULT NULL,
+`next_update` bigint DEFAULT NULL,
+`rev_count` int DEFAULT NULL,
+PRIMARY KEY (`instance`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+```
+
+This table must be created before this version of the application will work if a DB is used to store CA repository data.
 
 ### 1.2.0
 
