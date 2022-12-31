@@ -11,19 +11,38 @@
 | 1.1.3   | Publishing a new CRL directly upon CMC revocation instead of waiting for next update | 2022-02-23 |
 | 1.1.4   | Including mitigation of spring core RCE vulnerability                                | 2022-03-31 |
 | 1.1.5   | Moving to Spring boot 2.6.6 as a stable mitigation of RCE                            | 2022-03-31 |
+| 1.2.0   | Updates to use of the new Credential Support library for key configuration           | 2022-03-31 |
+| 1.3.0   | Update to support synchronized CRL metadata for multi server deployment of single CA | 2022-03-31 |
+
 
 
 ## Important release notes (most recent on top)
 
 Release notes are provided only for updates that require configuration changes or other deployment considerations.
 
-### 1.1.0
+### 1.3.0
 
-A new section 2.2.2.8 CA repository configuration is added, describing the configuration settings for setting up
-a CA repository using database storage.
+This version does not require any configuration update as all new configuration values have sensible defaults.
+
+The following parameter can be set in this version:
+
+> ca-service.config.crl-refresh-margin-seconds
+
+This property value in application.properties defines the age of the latest CRL that must pass before it is allowed to bump
+the current CRL metadata for all instances of the service. If this time has not passed, the service will make a
+CRL that match the metadata (CRL number, issue time, next update time) of the latest current CRL.
+
+This property has a default value of 60 seconds, which is used if this property is not set.
+
 
 ### 1.2.0
 
 This version does not require configuration of logotypes and icons. Any use of these graphical images has been removed.
 
 Caused by the update of HSM library, the only option remaining to configure a HSM slot is via a single PKCS#11 configuration file.
+
+### 1.1.0
+
+A new section 2.2.2.8 CA repository configuration is added, describing the configuration settings for setting up
+a CA repository using database storage.
+
