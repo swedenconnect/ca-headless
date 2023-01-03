@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022.  Agency for Digital Government (DIGG)
+ * Copyright (c) 2021-2023.  Agency for Digital Government (DIGG)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
+import java.time.Duration;
 import java.util.List;
 
 /**

@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package se.swedenconnect.ca.headless;
+package se.swedenconnect.ca.headless.ca.db;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@TestPropertySource(locations = "classpath:application-test.properties")
-@SpringBootTest
-@ActiveProfiles("nodb")
-class HeadlessCaApplicationTests {
-
-  @Test
-  void contextLoads() {
-  }
+/**
+ * JPA repository for CRL Metadata
+ *
+ * @author Martin Lindström (martin@idsec.se)
+ * @author Stefan Santesson (stefan@idsec.se)
+ */
+public interface DBCRLJPARepository extends JpaRepository<DBCRLMetadataRecord, String> {
 
 }

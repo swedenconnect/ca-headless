@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021. Agency for Digital Government (DIGG)
+ * Copyright (c) 2021-2023.  Agency for Digital Government (DIGG)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import se.swedenconnect.ca.engine.ca.repository.CertificateRecord;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
+
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -32,6 +34,7 @@ import java.util.Date;
  * @author Stefan Santesson (stefan@idsec.se)
  */
 @Entity
+@Table(name = "dbcertificate_record")
 @NoArgsConstructor
 public class DBCertificateRecord implements CertificateRecord {
 
