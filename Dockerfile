@@ -1,6 +1,6 @@
 FROM openjdk:11-jre
 
-ADD target/headless-ca-1.3.0.jar /app.jar
+ADD target/headless-ca-1.3.1-SNAPSHOT.jar /app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
 
 # Main web port
