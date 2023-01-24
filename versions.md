@@ -1,6 +1,6 @@
 # Headless CA versions
 
-**Latest current version 1.3.0**
+**Latest current version 1.3.1**
 
 | Version | Comment                                                                              | Date       |
 |---------|--------------------------------------------------------------------------------------|------------|
@@ -13,6 +13,7 @@
 | 1.1.5   | Moving to Spring boot 2.6.6 as a stable mitigation of RCE                            | 2022-04-01 |
 | 1.2.0   | Updates to use of the new Credential Support library for key configuration           | 2022-10-02 |
 | 1.3.0   | Update to support synchronized CRL metadata for multi server deployment of single CA | 2023-01-02 |
+| 1.3.1   | Updated ca-engine and dropping dependency on Jaxb                                    | 2023-01-24 |
 
 
 
