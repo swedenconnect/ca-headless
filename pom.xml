@@ -11,7 +11,7 @@
 
     <groupId>se.swedenconnect.ca</groupId>
     <artifactId>headless-ca</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3-SNAPSHOT</version>
 
     <name>Headless CA</name>
     <description>Basic headless CA Service with CMC as the only admin API</description>
