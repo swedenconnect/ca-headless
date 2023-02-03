@@ -18,7 +18,6 @@ package se.swedenconnect.ca.headless.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.cms.CMSException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.annotation.Bean;
