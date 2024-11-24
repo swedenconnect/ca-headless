@@ -1,6 +1,11 @@
-FROM openjdk:21-jdk
+FROM openjdk:21-jdk-buster
+RUN apt update \
+    && apt install -y procps softhsm2 opensc \
+    && rm -rf /var/lib/apt/lists/*
 
 ADD target/headless-ca-*.jar /app.jar
+
+# This ENTRYPOINT enables attachement of a debugger on port 8000. This port is automtically exposed on the docker container.
 ENTRYPOINT ["java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000","-jar","/app.jar"]
 
 # Main web port

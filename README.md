@@ -102,7 +102,7 @@ The **certs** folder is typically populated by the following files on instance i
 |----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `ca-chain.pem`       | This file holds the chain of certificates used by the CA to represent a path to a trusted root certificate. This file is initially created containing a single certificate, being the self issued CA certificate stored in the ca-self-signed.crt file. This file may be modified manually by the administrator if this CA is certified by another CA in order to create a path to a trusted root. If this file is modified, then all certificates including the trusted root certificate must be included. The certificates should be stored in the order from the CA certificate first and the root certificate last. All certificate must be stored in its PEM format. |
 | `ca-self-signed.crt` | This file holds the self signed CA certificate created for this CA instance at initialization.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `ocsp.crt`           | This certificate appears if, and only if, the CA is configured include an OCSP responder and a separate key pair is provided for the OSCP responder. The OCSP responder certificate can be re-issued by deleting this certificate and restarting the service. The OSCP responder can be re-keyed by replacing the OCSP responder key pair and deleting this certificate and restarting the service.                                                                                                                                                                                                                                                                       |
+| `ocsp.crt`           | This certificate appears if, and only if, the CA is configured include an OCSP responder and a separate key pair is provided for the OSCP responder. The OCSP responder certificate is automatically re-issued when it has reached half of its configured validity time. The OSCP responder can be re-keyed by replacing the OCSP responder key pair and deleting this certificate and restarting the service.                                                                                                                                                                                                                                                            |
 
 ##### 2.2.1.2 Keys folder
 The **keys** folder is used to store files holding key pair data for the CA instance. The files stored here are different depending on the key type specified in the configuration data as follows:
@@ -327,15 +327,15 @@ ca-service.instance.conf.ca01.ocsp.name.common-name=OCSP Responder
 This CA service includes the alternatives to use file storage or database storage for the CA repository.
 
 Use of database storage is the default option which requires `application.properties` to include appropriate settings for the database connection
-for the repository. The option to use file based storage is mainly intended for test, but may be used in production environments where the operational
-security advantages of a complete database is not required or desired. In order to use the file based CA repository it is necessary to opt-out of
-database usage. This can be done by activating the Spring profile "`nodb`" (See section 2.1). Using this profile causes the application to use a file based
+for the repository. The option to use file-based storage is mainly intended for test, but may be used in production environments where the operational
+security advantages of a complete database are not required or desired. To use the file-based CA repository, it is necessary to opt out of
+database usage. This can be done by activating the Spring profile "`nodb`" (See section 2.1). Using this profile causes the application to use a file-based
 repository and causes the application to ignore any database settings below.
 
 Database implementation use Spring Boot JPA (Jakarta Persistence API). This implementation allows a wide range of settings to optimize connection to
 any type of database. A useful guide is available here ([A guide to JPA with Spring](https://www.baeldung.com/the-persistence-layer-with-spring-and-jpa)).
 
-The dependencies of this project includes necessary dependencies for MySQL and PostgreSQL. To use any other DB service, relevant dependencies
+The dependencies of this project include necessary dependencies for MySQL and PostgreSQL. To use any other DB service, relevant dependencies
 must be added to the project.
 
 **Multiple server deployment:**
@@ -343,12 +343,12 @@ must be added to the project.
 Multiple server deployment is supported when a database is used to share the CA repository data. In this case the database
 is used to ensure that certificate and revocation information is synchronized between the server instances.
 
-This synchronization works out of the box and do not require any setup beyond ensuring that the database setup is
+This synchronization works out of the box and does not require any setup beyond ensuring that the database setup is
 complete with all necessary tables.
 
 ###### 2.2.2.8.1 General settings
 
-Database is configured using Spring Boot property settings for JPA and spring datasource properties as described in this section. The following general settings are allways relevant.
+Database is configured using Spring Boot property settings for JPA and spring datasource properties as described in this section. The following general settings are always relevant.
 
 | Property                      | Description                                                                                                                                                                                                                                                                                                                                                                             |
 |-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -460,7 +460,7 @@ A new CA instance is created using the following procedure:
 1. Create an instance data folder with the instance-id as the folder name, and then create a subfolder named "keys" inside the instance folder.
 2. Generate keys for the CA and its OCSP responder and store the applicable files in the "keys" folder.
 3. Update the application.properties file with appropriate property settings for the new instance.
-4. Restart the CA service. This will cause the service to initialize the new instance CA repository and to generate new self issued CA certificate and OCSP certificate in the "repository" and the "certs" folders.
+4. Restart the CA service. This will cause the service to initialize the new instance CA repository and to generate new self-issued CA certificate and OCSP certificate in the "repository" and the "certs" folders.
 
 If this CA instance is a root CA (is not signed by another CA higher in the trust path), then stop here.
 If this CA is a CA that should be signed by a root CA, then proceed as described in the next steps below. These instructions assume that the new instance created through step 1-4 is named "new-ca".
