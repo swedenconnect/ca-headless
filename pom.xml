@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.0</version>
+        <version>3.4.3</version>
         <relativePath/>
     </parent>
 
     <groupId>se.swedenconnect.ca</groupId>
     <artifactId>headless-ca</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
 
     <name>Headless CA</name>
     <description>Basic headless CA Service with CMC as the only admin API</description>
@@ -19,7 +19,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <ca.service.base.version>1.6.0</ca.service.base.version>
+        <ca.service.base.version>1.6.1</ca.service.base.version>
         <java.version>21</java.version>
     </properties>
 
@@ -81,12 +81,12 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.79</version>
+            <version>1.80</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.79</version>
+            <version>1.80</version>
         </dependency>
     </dependencies>
 
@@ -99,7 +99,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.7.0</version>
             </plugin>
         </plugins>
     </build>
