@@ -11,7 +11,7 @@
 
     <groupId>se.swedenconnect.ca</groupId>
     <artifactId>headless-ca</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.2</version>
 
     <name>Headless CA</name>
     <description>Basic headless CA Service with CMC as the only admin API</description>
@@ -28,11 +28,6 @@
             <id>central</id>
             <name>maven2</name>
             <url>https://repo1.maven.org/maven2/</url>
-        </repository>
-        <repository>
-            <id>idsec</id>
-            <name>libs-release</name>
-            <url>https://maven.eidastest.se/artifactory/libs-release</url>
         </repository>
     </repositories>
 
