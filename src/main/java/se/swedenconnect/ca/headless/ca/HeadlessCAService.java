@@ -34,7 +34,7 @@ import se.swedenconnect.ca.engine.ca.models.cert.impl.DefaultCertificateModelBui
 import se.swedenconnect.ca.engine.ca.repository.CARepository;
 import se.swedenconnect.ca.engine.revocation.crl.CRLIssuerModel;
 import se.swedenconnect.ca.service.base.ca.impl.AbstractBasicCA;
-import se.swedenconnect.security.credential.PkiCredential;
+import se.swedenconnect.security.credential.container.ManagedPkiCredential;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -54,7 +54,7 @@ import java.util.Objects;
 @Slf4j
 public class HeadlessCAService extends AbstractBasicCA {
 
-  public HeadlessCAService(PkiCredential issuerCredential,
+  public HeadlessCAService(ManagedPkiCredential issuerCredential,
     CARepository caRepository, CertificateIssuerModel certIssuerModel,
     CRLIssuerModel crlIssuerModel, List<String> crlDistributionPoints)
     throws NoSuchAlgorithmException, IOException, CertificateEncodingException {
