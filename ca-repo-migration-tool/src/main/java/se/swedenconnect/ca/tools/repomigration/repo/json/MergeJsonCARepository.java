@@ -16,8 +16,6 @@
 
 package se.swedenconnect.ca.tools.repomigration.repo.json;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -35,6 +33,9 @@ import se.swedenconnect.ca.engine.revocation.crl.RevokedCertificate;
 import se.swedenconnect.ca.service.base.configuration.keys.BasicX509Utils;
 import se.swedenconnect.ca.tools.repomigration.repo.MergeCARepository;
 import se.swedenconnect.ca.tools.repomigration.repo.db.DBCertificateRecord;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -312,7 +313,7 @@ public class MergeJsonCARepository implements CARepository, MergeCARepository {
       mapper.writeValue(certificateRecordsFile, issuedCerts);
       return true;
     }
-    catch (IOException e) {
+    catch (JacksonException e) {
       log.error("Error writing to the ca repository storage file", e);
       criticalError = true;
     }
