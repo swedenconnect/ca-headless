@@ -16,12 +16,12 @@
 
 package se.swedenconnect.ca.tools.repomigration.repo.db;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.NoArgsConstructor;
 import se.swedenconnect.ca.engine.ca.repository.CertificateRecord;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.math.BigInteger;
 import java.util.Date;
 

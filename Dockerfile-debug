@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk
+FROM eclipse-temurin:21-jre
 
 ADD target/headless-ca-*.jar /app.jar
 ENTRYPOINT ["java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000","-jar","/app.jar"]

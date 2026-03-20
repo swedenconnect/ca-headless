@@ -40,7 +40,7 @@ import se.swedenconnect.ca.service.base.ca.impl.AbstractDefaultCAServices;
 import se.swedenconnect.ca.service.base.configuration.keys.PkiCredentialFactory;
 import se.swedenconnect.ca.service.base.configuration.properties.CAConfigData;
 import se.swedenconnect.ca.service.base.utils.GeneralCAUtils;
-import se.swedenconnect.security.credential.PkiCredential;
+import se.swedenconnect.security.credential.container.ManagedPkiCredential;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -76,7 +76,7 @@ public class HeadlessCAServices extends AbstractDefaultCAServices {
   }
 
   /** {@inheritDoc} */
-  @Override protected AbstractBasicCA getBasicCaService(String instance, String type, PkiCredential issuerCredential,
+  @Override protected AbstractBasicCA getBasicCaService(String instance, String type, ManagedPkiCredential issuerCredential,
     CARepository caRepository, CertificateIssuerModel certIssuerModel, CRLIssuerModel crlIssuerModel, List<String> crlDistributionPoints)
     throws NoSuchAlgorithmException, IOException, CertificateEncodingException {
 
@@ -90,7 +90,7 @@ public class HeadlessCAServices extends AbstractDefaultCAServices {
   }
 
   /** {@inheritDoc} */
-  @Override protected X509CertificateHolder generateSelfIssuedCaCert(PkiCredential caKeySource, CAConfigData caConfigData, String instance, String baseUrl)
+  @Override protected X509CertificateHolder generateSelfIssuedCaCert(ManagedPkiCredential caKeySource, CAConfigData caConfigData, String instance, String baseUrl)
     throws NoSuchAlgorithmException, CertificateIssuanceException {
     // We implement our own Self issued profile in order to add the SubjectInfoAccess URL to self issued certificates
     CAConfigData.CaConfig caConfig = caConfigData.getCa();
