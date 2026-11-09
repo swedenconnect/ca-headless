@@ -34,6 +34,29 @@
     <properties>
         <java.version>21</java.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+
+        <!--
+          The GitHub Packages Maven registry of the Sweden Connect organization. Later releases of the Sweden Connect
+          CA libraries are published there only. Downloading needs a server with the id github in settings.xml, see
+          ../documentation/github-packages.md. Maven Central is listed first, so it is asked first for everything else.
+          -->
+        <repository>
+            <id>github</id>
+            <name>Sweden Connect on GitHub Packages</name>
+            <url>https://maven.pkg.github.com/swedenconnect/*</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>se.swedenconnect.ca</groupId>
